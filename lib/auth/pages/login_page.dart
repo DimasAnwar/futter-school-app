@@ -1,6 +1,7 @@
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import './widgets/custom_input.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -11,23 +12,54 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _authService = AuthServices();
   int selectedIndex = 0;
+  String selectedRole = 'Students';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isSubmitting = false;
 
-Future<void> _prosesLogin() async{
-  try{
-    await _authService.loginAkun(email: _emailController.text.trim(), password: _passwordController.text.trim());
+  Future<void> _prosesLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
 
-    if (mounted){
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Berhasil")));
-      Navigator.pushReplacementNamed(context, '/dashboard');
+    if (email.isEmpty || password.isEmpty) {
+      _showMessage('Email dan password wajib diisi.');
+      return;
     }
-  }catch (e){
-    if (mounted){
-      ScaffoldMessenger.of(context).showSnackBar( SnackBar(content: Text(e.toString())));
+
+    setState(() => _isSubmitting = true);
+    try {
+      final role = await _authService.loginAkun(
+        email: email,
+        password: password,
+        expectedRole: selectedRole,
+      );
+
+      if (mounted) {
+        _showMessage('Login berhasil sebagai $role.');
+        // AuthGate akan otomatis mengganti LoginPage ke DashboardPage
+        // ketika Supabase membuat session.
+      }
+    } catch (e) {
+      if (mounted) {
+        _showMessage(e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
-}
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +107,7 @@ Future<void> _prosesLogin() async{
                               offset: const Offset(2, 1),
                               blurRadius: 2,
                               spreadRadius: 2,
-                            )
+                            ),
                           ],
                         ),
                         child: Padding(
@@ -87,48 +119,67 @@ Future<void> _prosesLogin() async{
                                 children: [
                                   Container(
                                     width: 300,
-                                    height: 45, // Gua naikin dikit jadi 45 biar nggak sempit pas dikasih padding
-                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4), // Jarak luar ke tombol
+                                    height:
+                                        45, // Gua naikin dikit jadi 45 biar nggak sempit pas dikasih padding
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                      horizontal: 4,
+                                    ), // Jarak luar ke tombol
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFEAF1FF),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Row(
                                       // Ini yang bikin tombolnya nyebar rata ada jaraknya
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         // TOMBOL 1: STUDENTS (Index 0)
                                         Container(
                                           width: 90, // Lebar diubah jadi 90
                                           decoration: BoxDecoration(
-                                            color: selectedIndex == 0 ? Colors.white : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: selectedIndex == 0
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: TextButton(
                                             style: TextButton.styleFrom(
-                                              padding: EdgeInsets.zero, // Biar text gak kepotong di ruang sempit
+                                              padding: EdgeInsets
+                                                  .zero, // Biar text gak kepotong di ruang sempit
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                selectedIndex = 0;
-                                              });
+                            selectedIndex = 0;
+                            selectedRole = "Students";
+                          });
                                             },
                                             child: Text(
                                               "Students",
                                               style: TextStyle(
-                                                color: selectedIndex == 0 ? Colors.black : Colors.black54,
-                                                fontWeight: selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                                                color: selectedIndex == 0
+                                                    ? Colors.black
+                                                    : Colors.black54,
+                                                fontWeight: selectedIndex == 0
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                           ),
                                         ),
-                                        
+
                                         // TOMBOL 2: PARENTS (Index 1)
                                         Container(
                                           width: 90,
                                           decoration: BoxDecoration(
-                                            color: selectedIndex == 1 ? Colors.white : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: selectedIndex == 1
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: TextButton(
                                             style: TextButton.styleFrom(
@@ -137,24 +188,33 @@ Future<void> _prosesLogin() async{
                                             onPressed: () {
                                               setState(() {
                                                 selectedIndex = 1;
+                                                selectedRole = "Parents";
                                               });
                                             },
                                             child: Text(
                                               "Parents",
                                               style: TextStyle(
-                                                color: selectedIndex == 1 ? Colors.black : Colors.black54,
-                                                fontWeight: selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                                                color: selectedIndex == 1
+                                                    ? Colors.black
+                                                    : Colors.black54,
+                                                fontWeight: selectedIndex == 1
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                           ),
                                         ),
-                  
+
                                         // TOMBOL 3: TEACHER (Index 2)
                                         Container(
                                           width: 90,
                                           decoration: BoxDecoration(
-                                            color: selectedIndex == 2 ? Colors.white : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: selectedIndex == 2
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                           child: TextButton(
                                             style: TextButton.styleFrom(
@@ -163,84 +223,131 @@ Future<void> _prosesLogin() async{
                                             onPressed: () {
                                               setState(() {
                                                 selectedIndex = 2;
+                                                selectedRole = "Teachers";
                                               });
                                             },
                                             child: Text(
                                               "Teacher",
                                               style: TextStyle(
-                                                color: selectedIndex == 2 ? Colors.black : Colors.black54,
-                                                fontWeight: selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                                                color: selectedIndex == 2
+                                                    ? Colors.black
+                                                    : Colors.black54,
+                                                fontWeight: selectedIndex == 2
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                               SizedBox(height: 20),
                               SizedBox(
                                 width: double.infinity,
                                 child: Column(
-                                  crossAxisAlignment:CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("Email or ID"),
                                     SizedBox(height: 5),
                                     CustomTextField(
-                                      controller: _emailController, hintText: "Email or ID",icon: Icons.person,),
-                                      SizedBox(height: 10),
+                                      controller: _emailController,
+                                      hintText: "Email or ID",
+                                      icon: Icons.person,
+                                    ),
+                                    SizedBox(height: 10),
                                     Text("Password"),
                                     SizedBox(height: 5),
                                     CustomTextField(
-                                      controller: _passwordController, hintText: "Password",icon: Icons.lock, isPassword: true,),
-                                      SizedBox(height: 5,),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            TextButton(onPressed: (){}, child: Text("Forget Password?",style: TextStyle(color: Color(0xFF2563EB)),)),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        height: 50,
-                                        child: ElevatedButton(style:ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadiusGeometry.circular(10)
+                                      controller: _passwordController,
+                                      hintText: "Password",
+                                      icon: Icons.lock,
+                                      isPassword: true,
+                                    ),
+                                    SizedBox(height: 5),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Text(
+                                              "Forget Password?",
+                                              style: TextStyle(
+                                                color: Color(0xFF2563EB),
+                                              ),
+                                            ),
                                           ),
-                                          backgroundColor: Color(0xFF2563EB)
-                                        ), onPressed: (){
-                                          _prosesLogin();
-                                        }, child: Text("Sign In",style: TextStyle(color: Colors.white,fontSize: 20)))
-                                        )
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadiusGeometry.circular(
+                                                  10,
+                                                ),
+                                          ),
+                                          backgroundColor: Color(0xFF2563EB),
+                                        ),
+                                        onPressed: _isSubmitting
+                                            ? null
+                                            : _prosesLogin,
+                                        child: _isSubmitting
+                                            ? const SizedBox(
+                                                width: 22,
+                                                height: 22,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            : const Text(
+                                                'Sign In',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      
                       Text("Doesnt Have Account?"),
-                      TextButton(onPressed: (){
-                        Navigator.pushNamed(context, '/register');
-                      }, child: Text("Sign Up", style: TextStyle(
-                        color: Color(0xFF2563EB),
-                        fontWeight: FontWeight.bold
-                      ),))
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            color: Color(0xFF2563EB),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),

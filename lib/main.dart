@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import './auth/pages/login_page.dart';
 import 'auth/pages/register_page.dart';
-import 'dashboard/pages/dashboard_page.dart';
+import './services/auth_gate.dart';
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -21,11 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      home: const AuthGate(),
       routes: {
-        '/': (context) => const LoginPage(),
+        '/login' :(context) => const LoginPage(),
         '/register':(context) => const RegisterPage(), 
-        '/dashboard':(context) => const DashboardPage(), // halaman pertama
+        '/dashboard': (context) => const AuthGate(),
       },
     );
   }
