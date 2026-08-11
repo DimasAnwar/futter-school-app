@@ -8,16 +8,38 @@ class AuthServices {
     required String password,
     required String role,
     required String fullName,
+    String? nim,
+    String? jurusan,
   }) async {
     try {
+      final dataMap = <String, dynamic>{
+        'full_name': fullName,
+        'role': role,
+      };
+      if (nim != null && nim.isNotEmpty) dataMap['nim'] = nim;
+      if (jurusan != null && jurusan.isNotEmpty) dataMap['jurusan'] = jurusan;
+
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
-        data: {'full_name': fullName, 'role': role},
+        data: dataMap,
       );
 
-      if (response.user == null) {
+      final user = response.user;
+      if (user == null) {
         throw 'Akun tidak berhasil dibuat. Coba lagi.';
+      }
+
+      // Auto-assign nim & jurusan to profiles table if user session is available
+      final updatePayload = <String, dynamic>{};
+      if (nim != null && nim.isNotEmpty) updatePayload['nim'] = nim;
+      if (jurusan != null && jurusan.isNotEmpty) updatePayload['jurusan'] = jurusan;
+      if (updatePayload.isNotEmpty) {
+        try {
+          await _supabase.from('profiles').update(updatePayload).eq('id', user.id);
+        } catch (_) {
+          // Handled gracefully if session pending email confirmation
+        }
       }
 
       return response;

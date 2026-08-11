@@ -1,3 +1,5 @@
+import 'package:bestpractice/auth/pages/widgets/role_selector.dart';
+import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import './widgets/custom_input.dart';
@@ -17,12 +19,19 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isSubmitting = false;
 
+  static const List<RoleOption> _roleOptions = [
+    RoleOption(label: 'Student', roleKey: 'Students'),
+    RoleOption(label: 'Parent', roleKey: 'Parents'),
+    RoleOption(label: 'Teacher', roleKey: 'Teachers'),
+    RoleOption(label: 'Admin', roleKey: 'Admin'),
+  ];
+
   Future<void> _prosesLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      _showMessage('Email dan password wajib diisi.');
+      _showMessage('Email dan password wajib diisi.', isError: true);
       return;
     }
 
@@ -36,12 +45,10 @@ class _LoginPageState extends State<LoginPage> {
 
       if (mounted) {
         _showMessage('Login berhasil sebagai $role.');
-        // AuthGate akan otomatis mengganti LoginPage ke DashboardPage
-        // ketika Supabase membuat session.
       }
     } catch (e) {
       if (mounted) {
-        _showMessage(e.toString());
+        _showMessage(e.toString(), isError: true);
       }
     } finally {
       if (mounted) {
@@ -50,8 +57,8 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  void _showMessage(String message, {bool isError = false}) {
+    UiUtils.showToast(context, message, isError: isError);
   }
 
   @override
@@ -111,196 +118,66 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(20), // Perbaikan disini
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 300,
-                                    height:
-                                        45, // Gua naikin dikit jadi 45 biar nggak sempit pas dikasih padding
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 4,
-                                      horizontal: 4,
-                                    ), // Jarak luar ke tombol
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEAF1FF),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Row(
-                                      // Ini yang bikin tombolnya nyebar rata ada jaraknya
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // TOMBOL 1: STUDENTS (Index 0)
-                                        Container(
-                                          width: 90, // Lebar diubah jadi 90
-                                          decoration: BoxDecoration(
-                                            color: selectedIndex == 0
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              padding: EdgeInsets
-                                                  .zero, // Biar text gak kepotong di ruang sempit
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                            selectedIndex = 0;
-                            selectedRole = "Students";
-                          });
-                                            },
-                                            child: Text(
-                                              "Students",
-                                              style: TextStyle(
-                                                color: selectedIndex == 0
-                                                    ? Colors.black
-                                                    : Colors.black54,
-                                                fontWeight: selectedIndex == 0
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        // TOMBOL 2: PARENTS (Index 1)
-                                        Container(
-                                          width: 90,
-                                          decoration: BoxDecoration(
-                                            color: selectedIndex == 1
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                selectedIndex = 1;
-                                                selectedRole = "Parents";
-                                              });
-                                            },
-                                            child: Text(
-                                              "Parents",
-                                              style: TextStyle(
-                                                color: selectedIndex == 1
-                                                    ? Colors.black
-                                                    : Colors.black54,
-                                                fontWeight: selectedIndex == 1
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        // TOMBOL 3: TEACHER (Index 2)
-                                        Container(
-                                          width: 90,
-                                          decoration: BoxDecoration(
-                                            color: selectedIndex == 2
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                selectedIndex = 2;
-                                                selectedRole = "Teachers";
-                                              });
-                                            },
-                                            child: Text(
-                                              "Teacher",
-                                              style: TextStyle(
-                                                color: selectedIndex == 2
-                                                    ? Colors.black
-                                                    : Colors.black54,
-                                                fontWeight: selectedIndex == 2
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                              RoleSelector(
+                                options: _roleOptions,
+                                selectedIndex: selectedIndex,
+                                onRoleSelected: (index) {
+                                  setState(() {
+                                    selectedIndex = index;
+                                    selectedRole = _roleOptions[index].roleKey;
+                                  });
+                                },
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               SizedBox(
                                 width: double.infinity,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("Email or ID"),
-                                    SizedBox(height: 5),
+                                    const Text("Email or ID"),
+                                    const SizedBox(height: 5),
                                     CustomTextField(
                                       controller: _emailController,
                                       hintText: "Email or ID",
                                       icon: Icons.person,
                                     ),
-                                    SizedBox(height: 10),
-                                    Text("Password"),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 10),
+                                    const Text("Password"),
+                                    const SizedBox(height: 5),
                                     CustomTextField(
                                       controller: _passwordController,
                                       hintText: "Password",
                                       icon: Icons.lock,
                                       isPassword: true,
                                     ),
-                                    SizedBox(height: 5),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {},
-                                            child: Text(
-                                              "Forget Password?",
-                                              style: TextStyle(
-                                                color: Color(0xFF2563EB),
-                                              ),
-                                            ),
+                                    const SizedBox(height: 5),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: () {},
+                                        child: const Text(
+                                          "Forget Password?",
+                                          style: TextStyle(
+                                            color: Color(0xFF2563EB),
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
+                                    const SizedBox(height: 10),
                                     SizedBox(
                                       width: double.infinity,
                                       height: 50,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadiusGeometry.circular(
-                                                  10,
-                                                ),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
-                                          backgroundColor: Color(0xFF2563EB),
+                                          backgroundColor: const Color(0xFF2563EB),
                                         ),
-                                        onPressed: _isSubmitting
-                                            ? null
-                                            : _prosesLogin,
+                                        onPressed: _isSubmitting ? null : _prosesLogin,
                                         child: _isSubmitting
                                             ? const SizedBox(
                                                 width: 22,
@@ -331,12 +208,12 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Doesnt Have Account?"),
+                      const Text("Doesnt Have Account?"),
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/register');
                         },
-                        child: Text(
+                        child: const Text(
                           "Sign Up",
                           style: TextStyle(
                             color: Color(0xFF2563EB),

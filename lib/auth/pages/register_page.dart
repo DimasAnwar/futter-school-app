@@ -1,3 +1,5 @@
+import 'package:bestpractice/auth/pages/widgets/role_selector.dart';
+import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import './widgets/custom_input.dart';
@@ -17,31 +19,49 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
+  final TextEditingController _nimController = TextEditingController();
+  final TextEditingController _jurusanController = TextEditingController();
   bool _isSubmitting = false;
+
+  bool get _isStudentRole =>
+      selectedRole.toLowerCase() == 'students' ||
+      selectedRole.toLowerCase() == 'student';
+
+  static const List<RoleOption> _roleOptions = [
+    RoleOption(label: 'Students', roleKey: 'Students'),
+    RoleOption(label: 'Parents', roleKey: 'Parents'),
+    RoleOption(label: 'Teacher', roleKey: 'Teachers'),
+  ];
 
   Future<void> _prosesRegister() async {
     final fullName = _fullnameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmController.text.trim();
+    final nim = _nimController.text.trim();
+    final jurusan = _jurusanController.text.trim();
 
     if (fullName.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      _showMessage('Semua field wajib diisi.');
+      _showMessage('Semua field wajib diisi.', isError: true);
+      return;
+    }
+    if (_isStudentRole && (nim.isEmpty || jurusan.isEmpty)) {
+      _showMessage('NIM dan Jurusan wajib diisi untuk siswa.', isError: true);
       return;
     }
     if (!email.contains('@')) {
-      _showMessage('Masukkan alamat email yang valid.');
+      _showMessage('Masukkan alamat email yang valid.', isError: true);
       return;
     }
     if (password.length < 6) {
-      _showMessage('Password minimal 6 karakter.');
+      _showMessage('Password minimal 6 karakter.', isError: true);
       return;
     }
     if (password != confirmPassword) {
-      _showMessage('Konfirmasi password tidak sama.');
+      _showMessage('Konfirmasi password tidak sama.', isError: true);
       return;
     }
 
@@ -52,6 +72,8 @@ class _RegisterPageState extends State<RegisterPage> {
         password: password,
         role: selectedRole,
         fullName: fullName,
+        nim: _isStudentRole ? nim : null,
+        jurusan: _isStudentRole ? jurusan : null,
       );
       if (mounted) {
         _showMessage(
@@ -63,9 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        _showMessage(e.toString(), isError: true);
       }
     } finally {
       if (mounted) {
@@ -74,10 +94,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+  void _showMessage(String message, {bool isError = false}) {
+    UiUtils.showToast(context, message, isError: isError);
   }
 
   @override
@@ -86,6 +104,8 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _nimController.dispose();
+    _jurusanController.dispose();
     super.dispose();
   }
 
@@ -93,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,113 +124,17 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const Text("Sign up to get started"),
               const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                height: 45, // Naikkan sedikit supaya tidak terlalu sempit
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEAF1FF),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // TOMBOL 1: STUDENTS (Index 0)
-                    Container(
-                      width: 90,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == 0
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: () {
-                          setState(() {
-                            selectedIndex = 0;
-                            selectedRole = "Students";
-                          });
-                        },
-                        child: Text(
-                          "Students",
-                          style: TextStyle(
-                            color: selectedIndex == 0
-                                ? Colors.black
-                                : Colors.black54,
-                            fontWeight: selectedIndex == 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // TOMBOL 2: PARENTS (Index 1)
-                    Container(
-                      width: 90,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == 1
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: () {
-                          setState(() {
-                            selectedIndex = 1;
-                            selectedRole = "Parents";
-                          });
-                        },
-                        child: Text(
-                          "Parents",
-                          style: TextStyle(
-                            color: selectedIndex == 1
-                                ? Colors.black
-                                : Colors.black54,
-                            fontWeight: selectedIndex == 1
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // TOMBOL 3: TEACHER (Index 2)
-                    Container(
-                      width: 90,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == 2
-                            ? Colors.white
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: () {
-                          setState(() {
-                            selectedIndex = 2;
-                            selectedRole = "Teachers";
-                          });
-                        },
-                        child: Text(
-                          "Teacher",
-                          style: TextStyle(
-                            color: selectedIndex == 2
-                                ? Colors.black
-                                : Colors.black54,
-                            fontWeight: selectedIndex == 2
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              RoleSelector(
+                options: _roleOptions,
+                selectedIndex: selectedIndex,
+                onRoleSelected: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                    selectedRole = _roleOptions[index].roleKey;
+                  });
+                },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -246,9 +170,27 @@ class _RegisterPageState extends State<RegisterPage> {
                           SizedBox(height: 5),
                           CustomTextField(
                             controller: _emailController,
-                            hintText: "Jhoen Doe",
+                            hintText: "email@domain.com",
                             icon: Icons.email,
                           ),
+                          if (_isStudentRole) ...[
+                            SizedBox(height: 10),
+                            Text("NIM"),
+                            SizedBox(height: 5),
+                            CustomTextField(
+                              controller: _nimController,
+                              hintText: "Nomor Induk Mahasiswa",
+                              icon: Icons.badge_outlined,
+                            ),
+                            SizedBox(height: 10),
+                            Text("Jurusan"),
+                            SizedBox(height: 5),
+                            CustomTextField(
+                              controller: _jurusanController,
+                              hintText: "Teknik Informatika",
+                              icon: Icons.school_outlined,
+                            ),
+                          ],
                           SizedBox(height: 10),
                           Text("Password"),
                           SizedBox(height: 5),

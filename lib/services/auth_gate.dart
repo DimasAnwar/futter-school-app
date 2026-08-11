@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/pages/login_page.dart';
 import '../dashboard/pages/parent_dashboard_page.dart';
+import '../dashboard/pages/admin_dashboard_page.dart';
 import '../dashboard/pages/student_dashboard_page.dart';
 import '../dashboard/pages/teacher_dashboard_page.dart';
 import 'auth_services.dart';
@@ -43,6 +44,9 @@ class AuthGate extends StatelessWidget {
             final name = (profile['full_name'] as String?)?.trim();
             final fullName = (name == null || name.isEmpty) ? 'Pengguna' : name;
             final role = (profile['role'] as String? ?? '').toLowerCase();
+            if (role == 'admin' || role == 'admins') {
+              return AdminDashboardPage(fullName: fullName);
+            }
             if (role == 'student' || role == 'students') {
               return StudentDashboardPage(fullName: fullName);
             }
