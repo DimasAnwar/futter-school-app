@@ -96,13 +96,17 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final appBarBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: appBarBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
+          icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -110,17 +114,17 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
           children: [
             Text(
               _courseName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: textColor,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             Text(
               'Kode: $_courseCode • $_sks SKS • Semester $_semester',
-              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
             ),
           ],
         ),
@@ -146,7 +150,7 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                   children: [
                     // Course Header Info Box
                     Container(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                       child: Column(
                         children: [
@@ -187,10 +191,11 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                                 child: OutlinedButton.icon(
                                   onPressed: _showEnrolledStudentsSheet,
                                   icon: const Icon(Icons.people_alt_rounded, size: 16),
-                                  label: const Text('Daftar Siswa', style: TextStyle(fontSize: 12)),
+                                  label: const Text('Daftar Siswa', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                   style: OutlinedButton.styleFrom(
-                                    foregroundColor: const Color(0xFF2563EB),
-                                    side: const BorderSide(color: Color(0xFFBFDBFE)),
+                                    foregroundColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                                    side: BorderSide(color: isDark ? const Color(0xFF60A5FA) : const Color(0xFFBFDBFE)),
+                                    backgroundColor: isDark ? const Color(0xFF2563EB).withValues(alpha: 0.25) : Colors.transparent,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
                                 ),
@@ -199,7 +204,7 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                               ElevatedButton.icon(
                                 onPressed: _showUploadMateriModal,
                                 icon: const Icon(Icons.cloud_upload_rounded, size: 16),
-                                label: const Text('Upload Materi', style: TextStyle(fontSize: 12)),
+                                label: const Text('Upload Materi', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF2563EB),
                                   foregroundColor: Colors.white,
@@ -211,7 +216,7 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                               ElevatedButton.icon(
                                 onPressed: _showAssignTugasModal,
                                 icon: const Icon(Icons.add_task_rounded, size: 16),
-                                label: const Text('Buat Tugas', style: TextStyle(fontSize: 12)),
+                                label: const Text('Buat Tugas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFF59E0B),
                                   foregroundColor: Colors.white,
@@ -227,11 +232,11 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
 
                     // Tab Bar
                     Container(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       child: TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xFF2563EB),
-                        unselectedLabelColor: const Color(0xFF64748B),
+                        labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                        unselectedLabelColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
                         indicatorColor: const Color(0xFF2563EB),
                         indicatorWeight: 3,
                         tabs: [
@@ -259,7 +264,7 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                       ),
                     ),
 
-                    const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                    Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
 
                     // Tab Bar View Content
                     Expanded(
@@ -280,6 +285,12 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
 
   // --- TAB 1: DAFTAR MATERI ---
   Widget _buildMateriTabContent() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final descColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
+    final linkBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final linkBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     if (_materiList.isEmpty) {
       return const EmptyStateWidget(
         message: 'Belum ada materi untuk mata kuliah ini. Klik tombol "Upload Materi" di atas untuk menambahkan.',
@@ -327,25 +338,25 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                         Expanded(
                           child: Text(
                             judul,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
-                              color: Color(0xFF0F172A),
+                              color: textColor,
                             ),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF3E8FF),
+                            color: isDark ? const Color(0xFF3B0764) : const Color(0xFFF3E8FF),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
+                          child: Text(
                             'MODUL MATERI',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF8B5CF6),
+                              color: isDark ? const Color(0xFFC084FC) : const Color(0xFF8B5CF6),
                             ),
                           ),
                         ),
@@ -354,28 +365,28 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
                     const SizedBox(height: 6),
                     Text(
                       deskripsi,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF475569), height: 1.4),
+                      style: TextStyle(fontSize: 13, color: descColor, height: 1.4),
                     ),
                     if (fileUrl.isNotEmpty) ...[
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                          color: linkBg,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: linkBorder),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.link_rounded, size: 16, color: Color(0xFF2563EB)),
+                            const Icon(Icons.link_rounded, size: 16, color: Color(0xFF3B82F6)),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 fileUrl,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
+                                  color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF2563EB),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,

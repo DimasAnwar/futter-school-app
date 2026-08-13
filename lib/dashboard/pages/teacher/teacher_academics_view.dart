@@ -18,9 +18,11 @@ class TeacherAcademicsView extends StatefulWidget {
     required this.materiList,
     required this.tugasList,
     required this.submissions,
+    this.enrollments = const [],
     required this.initialSubTabIndex,
     required this.onRefresh,
     required this.onShowToast,
+    this.onGoToHome,
   });
 
   final String teacherId;
@@ -28,9 +30,11 @@ class TeacherAcademicsView extends StatefulWidget {
   final List<Map<String, dynamic>> materiList;
   final List<Map<String, dynamic>> tugasList;
   final List<Map<String, dynamic>> submissions;
+  final List<Map<String, dynamic>> enrollments;
   final int initialSubTabIndex;
   final Future<void> Function() onRefresh;
   final Function(String message, {bool isError}) onShowToast;
+  final VoidCallback? onGoToHome;
 
   @override
   State<TeacherAcademicsView> createState() => _TeacherAcademicsViewState();
@@ -58,26 +62,38 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final headerBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return Column(
       children: [
         // Sub Header Tabs Bar
         Container(
-          color: Colors.white,
+          color: headerBg,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  if (widget.onGoToHome != null) ...[
+                    IconButton(
+                      onPressed: widget.onGoToHome,
+                      icon: Icon(Icons.arrow_back_rounded, color: textColor),
+                      tooltip: 'Ke Beranda',
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
                     'Akademik & Pengajaran',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: textColor,
                     ),
                   ),
+                  const Spacer(),
                   IconButton(
                     onPressed: widget.onRefresh,
                     icon: const Icon(Icons.refresh_rounded, color: Color(0xFF2563EB)),
@@ -180,15 +196,20 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
       itemCount: widget.courses.length,
       itemBuilder: (context, index) {
         final course = widget.courses[index];
-        final courseId = course['id'] as String? ?? '';
+        final courseId = (course['id'] as String? ?? '').trim();
 
         final courseMateriCount = widget.materiList.where((m) {
           final cId = m['course_id'] as String? ?? ((m['mata_kuliah'] as Map<String, dynamic>?)?['id'] as String?);
-          return cId == courseId;
+          return cId?.trim() == courseId;
         }).length;
 
         final courseTugasCount = widget.tugasList.where((t) {
           final cId = t['course_id'] as String? ?? ((t['mata_kuliah'] as Map<String, dynamic>?)?['id'] as String?);
+          return cId?.trim() == courseId;
+        }).length;
+
+        final courseStudentsCount = widget.enrollments.where((e) {
+          final cId = e['course_id']?.toString().trim();
           return cId == courseId;
         }).length;
 
@@ -197,6 +218,7 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
           role: 'teacher',
           materiCount: courseMateriCount,
           tugasCount: courseTugasCount,
+          enrolledStudentsCount: courseStudentsCount,
           onTapCard: () {
             Navigator.push(
               context,

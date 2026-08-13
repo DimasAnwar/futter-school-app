@@ -35,6 +35,15 @@ class TaskCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final descColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final courseBadgeBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final courseBadgeText = isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB);
+    final deadlineBg = isDark ? const Color(0xFF451A03).withValues(alpha: 0.6) : const Color(0xFFFFFBEB);
+    final deadlineBorder = isDark ? const Color(0xFF78350F) : const Color(0xFFFDE68A);
+    final deadlineText = isDark ? const Color(0xFFFDE047) : const Color(0xFFB45309);
+
     final judulTugas = (tugas['judul_tugas'] as String?) ?? (tugas['judul'] as String?) ?? 'Tugas Kuliah';
     final deskripsi = tugas['deskripsi'] as String? ?? 'Tidak ada deskripsi.';
     final deadline = tugas['deadline'] as String? ?? 'Tidak ada deadline';
@@ -66,15 +75,15 @@ class TaskCardWidget extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
+                      color: courseBadgeBg,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       courseBadgeStr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2563EB),
+                        color: courseBadgeText,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -86,19 +95,19 @@ class TaskCardWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
+                      color: isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.assignment_rounded, size: 12, color: Color(0xFFD97706)),
-                        SizedBox(width: 4),
+                        Icon(Icons.assignment_rounded, size: 12, color: isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706)),
+                        const SizedBox(width: 4),
                         Text(
                           'TUGAS AKTIF',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFD97706),
+                            color: isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706),
                           ),
                         ),
                       ],
@@ -109,8 +118,10 @@ class TaskCardWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: isGraded
-                          ? const Color(0xFFD1FAE5)
-                          : (isSubmitted ? const Color(0xFFE0F2FE) : const Color(0xFFFEF3C7)),
+                          ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5))
+                          : (isSubmitted
+                              ? (isDark ? const Color(0xFF075985) : const Color(0xFFE0F2FE))
+                              : (isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7))),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -121,8 +132,10 @@ class TaskCardWidget extends StatelessWidget {
                               : (isSubmitted ? Icons.check_circle_rounded : Icons.pending_actions_rounded),
                           size: 12,
                           color: isGraded
-                              ? const Color(0xFF059669)
-                              : (isSubmitted ? const Color(0xFF0284C7) : const Color(0xFFD97706)),
+                              ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669))
+                              : (isSubmitted
+                                  ? (isDark ? const Color(0xFF7DD3FC) : const Color(0xFF0284C7))
+                                  : (isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706))),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -133,8 +146,10 @@ class TaskCardWidget extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: isGraded
-                                ? const Color(0xFF059669)
-                                : (isSubmitted ? const Color(0xFF0284C7) : const Color(0xFFD97706)),
+                                ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669))
+                                : (isSubmitted
+                                    ? (isDark ? const Color(0xFF7DD3FC) : const Color(0xFF0284C7))
+                                    : (isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706))),
                           ),
                         ),
                       ],
@@ -147,10 +162,10 @@ class TaskCardWidget extends StatelessWidget {
             // Task Title
             Text(
               judulTugas,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: titleColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -158,7 +173,7 @@ class TaskCardWidget extends StatelessWidget {
             // Instruction Excerpt
             Text(
               deskripsi,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.4),
+              style: TextStyle(fontSize: 12, color: descColor, height: 1.4),
               maxLines: onTapCard != null ? 2 : null,
               overflow: onTapCard != null ? TextOverflow.ellipsis : null,
             ),
@@ -168,21 +183,21 @@ class TaskCardWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFBEB),
+                color: deadlineBg,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFFDE68A)),
+                border: Border.all(color: deadlineBorder),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.event_available_rounded, size: 16, color: Color(0xFFD97706)),
+                  Icon(Icons.event_available_rounded, size: 16, color: deadlineText),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Deadline: $deadline',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFB45309),
+                        color: deadlineText,
                       ),
                     ),
                   ),

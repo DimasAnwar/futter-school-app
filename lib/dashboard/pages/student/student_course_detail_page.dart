@@ -63,12 +63,16 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
       return tCourseId == courseId;
     }).toList();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text(namaMk, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
+        title: Text(namaMk, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: textColor)),
+        backgroundColor: cardBg,
+        foregroundColor: textColor,
         elevation: 0.5,
       ),
       body: SafeArea(
@@ -77,7 +81,7 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
             // Course Banner Card
             Container(
               width: double.infinity,
-              color: Colors.white,
+              color: cardBg,
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,12 +103,12 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                           children: [
                             Text(
                               namaMk,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'Kode: $kodeMk • $sks SKS',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                              style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B)),
                             ),
                           ],
                         ),
@@ -112,12 +116,12 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD1FAE5),
+                          color: isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Mata Kuliah Aktif',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669)),
                         ),
                       ),
                     ],
@@ -125,7 +129,7 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                   const SizedBox(height: 12),
                   Text(
                     deskripsi,
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF475569), height: 1.4),
+                    style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569), height: 1.4),
                   ),
                 ],
               ),
@@ -133,13 +137,13 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
 
             // Tab Navigation Header
             Container(
-              color: Colors.white,
+              color: cardBg,
               child: TabBar(
                 controller: _tabController,
                 indicatorColor: const Color(0xFF2563EB),
                 indicatorWeight: 3,
-                labelColor: const Color(0xFF2563EB),
-                unselectedLabelColor: const Color(0xFF64748B),
+                labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                unselectedLabelColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 tabs: [
                   Tab(text: 'Materi (${courseMateri.length})'),
@@ -170,6 +174,12 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
   }
 
   Widget _buildMateriList(List<Map<String, dynamic>> courseMateri) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final descColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
+    final subBoxBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final subBoxBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     if (courseMateri.isEmpty) {
       return const EmptyStateWidget(
         message: 'Belum ada materi perkuliahan untuk mata kuliah ini.',
@@ -206,16 +216,16 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
+                        color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.menu_book_rounded, color: Color(0xFF2563EB), size: 20),
+                      child: Icon(Icons.menu_book_rounded, color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB), size: 20),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         judul,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
                       ),
                     ),
                     const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
@@ -224,7 +234,7 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                 const SizedBox(height: 8),
                 Text(
                   deskripsi,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF475569), height: 1.4),
+                  style: TextStyle(fontSize: 13, color: descColor, height: 1.4),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -233,18 +243,18 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: subBoxBg,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(color: subBoxBorder),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.attachment_rounded, size: 16, color: Color(0xFF2563EB)),
+                        const Icon(Icons.attachment_rounded, size: 16, color: Color(0xFF3B82F6)),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             'Berkas Materi: $fileUrl',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF2563EB)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

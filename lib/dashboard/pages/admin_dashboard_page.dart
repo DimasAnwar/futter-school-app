@@ -94,14 +94,26 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: _buildBodyContent(),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return PopScope(
+      canPop: _currentNavIndex == 0 && _currentScreen == AdminScreen.home,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        setState(() {
+          _currentNavIndex = 0;
+          _currentScreen = AdminScreen.home;
+          _previousScreen = AdminScreen.home;
+        });
+      },
+      child: Scaffold(
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        body: SafeArea(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: _buildBodyContent(),
+          ),
         ),
-      ),
       bottomNavigationBar: AdminBottomNav(
         currentIndex: _currentNavIndex,
         onTap: (index) {
@@ -130,7 +142,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           });
         },
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildBodyContent() {

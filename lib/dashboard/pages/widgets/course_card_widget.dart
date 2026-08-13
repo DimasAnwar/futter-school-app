@@ -27,6 +27,11 @@ class CourseCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subContainerBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final subContainerBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     final namaMk = (course['nama_mk'] as String?) ?? (course['nama'] as String?) ?? 'Mata Kuliah';
     final kodeMk = (course['kode_mk'] as String?) ?? (course['kode'] as String?) ?? '-';
     final sks = course['sks']?.toString() ?? '3';
@@ -58,10 +63,10 @@ class CourseCardWidget extends StatelessWidget {
                     children: [
                       Text(
                         namaMk,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -69,7 +74,7 @@ class CourseCardWidget extends StatelessWidget {
                         role == 'teacher'
                             ? 'Kode: $kodeMk • $sks SKS • Semester $semester'
                             : 'Kode: $kodeMk • $sks SKS',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
                       ),
                     ],
                   ),
@@ -81,9 +86,9 @@ class CourseCardWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: subContainerBg,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: subContainerBorder),
               ),
               child: Row(
                 children: [
@@ -91,23 +96,23 @@ class CourseCardWidget extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     '${materiCount ?? 0} Modul Materi',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF475569),
+                      color: isDark ? Colors.white : const Color(0xFF475569),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Container(width: 1, height: 16, color: const Color(0xFFCBD5E1)),
+                  Container(width: 1, height: 16, color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
                   const SizedBox(width: 16),
                   const Icon(Icons.assignment_rounded, size: 16, color: Color(0xFFF59E0B)),
                   const SizedBox(width: 6),
                   Text(
                     '${tugasCount ?? 0} Tugas Kuliah',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF475569),
+                      color: isDark ? Colors.white : const Color(0xFF475569),
                     ),
                   ),
                 ],
@@ -115,7 +120,7 @@ class CourseCardWidget extends StatelessWidget {
             ),
             if (role == 'teacher' && (onUploadMateri != null || onAssignTugas != null || onShowStudents != null)) ...[
               const SizedBox(height: 12),
-              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
               const SizedBox(height: 10),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -124,8 +129,9 @@ class CourseCardWidget extends StatelessWidget {
                     if (onUploadMateri != null)
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF8B5CF6),
-                          side: const BorderSide(color: Color(0xFF8B5CF6)),
+                          foregroundColor: isDark ? Colors.white : const Color(0xFF8B5CF6),
+                          side: BorderSide(color: isDark ? const Color(0xFFA78BFA) : const Color(0xFF8B5CF6)),
+                          backgroundColor: isDark ? const Color(0xFF8B5CF6).withValues(alpha: 0.25) : Colors.transparent,
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
@@ -137,8 +143,9 @@ class CourseCardWidget extends StatelessWidget {
                       const SizedBox(width: 6),
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF2563EB),
-                          side: const BorderSide(color: Color(0xFF2563EB)),
+                          foregroundColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                          side: BorderSide(color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB)),
+                          backgroundColor: isDark ? const Color(0xFF2563EB).withValues(alpha: 0.25) : Colors.transparent,
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
@@ -151,8 +158,9 @@ class CourseCardWidget extends StatelessWidget {
                       const SizedBox(width: 6),
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF059669),
-                          side: const BorderSide(color: Color(0xFF059669)),
+                          foregroundColor: isDark ? Colors.white : const Color(0xFF059669),
+                          side: BorderSide(color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669)),
+                          backgroundColor: isDark ? const Color(0xFF059669).withValues(alpha: 0.25) : Colors.transparent,
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),

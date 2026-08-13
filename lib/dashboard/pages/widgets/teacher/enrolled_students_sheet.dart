@@ -74,10 +74,21 @@ class _EnrolledStudentsSheetState extends State<EnrolledStudentsSheet> {
                   separatorBuilder: (context, i) => const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final student = students[index];
-                    final name = student['full_name'] as String? ?? 'Siswa';
-                    final email = student['email'] as String? ?? '-';
-                    final nim = student['nim'] as String?;
-                    final subtitleText = (nim != null && nim.isNotEmpty) ? 'NIM: $nim • $email' : email;
+                    final rawName = (student['full_name'] as String?) ?? (student['name'] as String?);
+                    final email = (student['email'] as String?) ?? '-';
+                    final nim = (student['nim'] as String?);
+                    final studentId = student['id']?.toString() ?? '';
+
+                    final name = (rawName != null && rawName.trim().isNotEmpty && rawName != 'Siswa')
+                        ? rawName.trim()
+                        : (email != '-' && email.contains('@')
+                            ? email.split('@').first
+                            : 'Siswa ${studentId.length > 5 ? "(${studentId.substring(0, 5)})" : ""}');
+
+                    final subtitleText = [
+                      if (nim != null && nim.isNotEmpty && nim != '-') 'NIM: $nim',
+                      if (email != '-') email,
+                    ].join(' • ');
 
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -92,7 +103,7 @@ class _EnrolledStudentsSheetState extends State<EnrolledStudentsSheet> {
                         ),
                       ),
                       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: Text(subtitleText),
+                      subtitle: Text(subtitleText.isEmpty ? 'NIM: Belum diatur' : subtitleText),
                     );
                   },
                 );

@@ -14,22 +14,26 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: titleColor,
           ),
         ),
         if (subtitle != null && subtitle!.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
             subtitle!,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.4),
+            style: TextStyle(fontSize: 14, color: subtitleColor, height: 1.4),
           ),
         ],
         SizedBox(height: bottomSpacing),

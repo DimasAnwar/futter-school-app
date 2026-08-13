@@ -44,21 +44,34 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: _buildBodyContent(),
-        ),
-      ),
-      bottomNavigationBar: StudentBottomNav(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return PopScope(
+      canPop: _currentNavIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentNavIndex != 0) {
           setState(() {
-            _currentNavIndex = index;
+            _currentNavIndex = 0;
           });
-        },
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        body: SafeArea(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: _buildBodyContent(),
+          ),
+        ),
+        bottomNavigationBar: StudentBottomNav(
+          currentIndex: _currentNavIndex,
+          onTap: (index) {
+            setState(() {
+              _currentNavIndex = index;
+            });
+          },
+        ),
       ),
     );
   }

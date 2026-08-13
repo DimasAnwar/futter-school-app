@@ -50,12 +50,12 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
   Widget build(BuildContext context) {
     final isDosenMode = widget.participantType == 'Dosen';
 
-    final selectedCourse = widget.courses.firstWhere(
+    final selectedCourse = widget.courses.cast<Map<String, dynamic>>().firstWhere(
       (c) => c['id'] == widget.selectedCourseId,
       orElse: () => <String, dynamic>{},
     );
     final currentDosenId = selectedCourse['dosen_id'] as String?;
-    final currentDosen = widget.teachers.firstWhere(
+    final currentDosen = widget.teachers.cast<Map<String, dynamic>>().firstWhere(
       (t) => t['id'] == currentDosenId,
       orElse: () => <String, dynamic>{},
     );
@@ -165,7 +165,7 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                           : 'Semester Genap';
                       final isSelected = widget.selectedCourseId == id;
                       final courseDosenId = c['dosen_id'] as String?;
-                      final courseDosen = widget.teachers.firstWhere(
+                      final courseDosen = widget.teachers.cast<Map<String, dynamic>>().firstWhere(
                         (t) => t['id'] == courseDosenId,
                         orElse: () => <String, dynamic>{},
                       );

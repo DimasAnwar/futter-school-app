@@ -1,8 +1,5 @@
-import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/teacher/teacher_submission_detail_page.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/card_container.dart';
-import 'package:bestpractice/dashboard/pages/widgets/admin/custom_buttons.dart';
-import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/empty_state.dart';
 import 'package:bestpractice/services/teacher_services.dart';
 import 'package:flutter/material.dart';
@@ -78,6 +75,10 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
         .where((s) => s['tugas_id'] == _selectedTugasId)
         .toList();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final dropdownBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -86,23 +87,34 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Pilih Tugas untuk Dinilai:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 initialValue: _selectedTugasId,
+                dropdownColor: dropdownBg,
+                style: TextStyle(color: textColor, fontSize: 14),
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  ),
                 ),
                 items: widget.tugasList.map((tugas) {
                   final tTitle = (tugas['judul_tugas'] as String?) ?? (tugas['judul'] as String?) ?? 'Tugas';
                   return DropdownMenuItem<String>(
                     value: tugas['id'] as String,
-                    child: Text(tTitle, overflow: TextOverflow.ellipsis),
+                    child: Text(tTitle, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor)),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -118,7 +130,7 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2563EB),
+                  color: Color(0xFF3B82F6),
                 ),
               ),
             ],
@@ -128,16 +140,20 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
         const SizedBox(height: 16),
 
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Pengumpulan Tugas ($tugasTitle)',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+            Expanded(
+              child: Text(
+                'Pengumpulan Tugas ($tugasTitle)',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -145,7 +161,7 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'Total: ${taskSubmissions.length} Pengumpulan',
+                'Total: ${taskSubmissions.length}',
                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
               ),
             ),
@@ -167,8 +183,8 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
           ...taskSubmissions.map((submission) {
             final studentId = submission['student_id'] as String? ?? '';
             final profileMap = submission['profiles'] as Map<String, dynamic>?;
-            final studentMap = _enrolledStudents.firstWhere(
-              (s) => s['id'] == studentId,
+            final studentMap = _enrolledStudents.cast<Map<String, dynamic>>().firstWhere(
+              (s) => s['id']?.toString().trim().toLowerCase() == studentId.trim().toLowerCase(),
               orElse: () => profileMap ?? <String, dynamic>{},
             );
 
@@ -188,6 +204,7 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CircleAvatar(
                         backgroundColor: const Color(0xFFEFF6FF),
@@ -210,16 +227,22 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            const SizedBox(height: 2),
                             Text(
                               (studentNim != null && studentNim.isNotEmpty) ? 'NIM: $studentNim • $studentEmail' : studentEmail,
                               style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: isGraded ? const Color(0xFFD1FAE5) : const Color(0xFFFEF3C7),
                           borderRadius: BorderRadius.circular(8),
@@ -227,7 +250,7 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                         child: Text(
                           isGraded ? 'Nilai: $currentGrade' : 'Belum Dinilai',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: isGraded ? const Color(0xFF059669) : const Color(0xFFD97706),
                           ),
@@ -293,6 +316,9 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                                 submission: submission,
                                 tugasTitle: tugasTitle,
                                 courseName: courseName,
+                                studentName: studentName,
+                                studentEmail: studentEmail,
+                                studentNim: studentNim,
                               ),
                             ),
                           );
@@ -301,11 +327,6 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
                         icon: const Icon(Icons.description_rounded, size: 16),
                         label: const Text('Detail & Beri Nilai', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                       ),
-                      const SizedBox(width: 8),
-                      PrimaryButton(
-                        label: isGraded ? 'Edit Nilai' : 'Beri Nilai',
-                        onPressed: () => _openGradeDialog(studentId, studentName, submission),
-                      ),
                     ],
                   ),
                 ],
@@ -313,78 +334,6 @@ class _BeriNilaiModuleState extends State<BeriNilaiModule> {
             );
           }),
       ],
-    );
-  }
-
-  void _openGradeDialog(String studentId, String studentName, Map<String, dynamic> submission) {
-    final gradeController = TextEditingController(
-      text: submission['nilai'] != null ? submission['nilai'].toString() : '',
-    );
-    final feedbackController = TextEditingController(
-      text: submission['catatan_dosen'] as String? ?? '',
-    );
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Beri Nilai - $studentName'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomFormField(
-              controller: gradeController,
-              label: 'Nilai (0 - 100)',
-              hintText: 'Contoh: 85',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            CustomFormField(
-              controller: feedbackController,
-              label: 'Catatan / Feedback Dosen',
-              hintText: 'Pekerjaan sangat baik, pertahankan...',
-              maxLines: 2,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Batal')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981)),
-            onPressed: () async {
-              final textScore = gradeController.text.trim();
-              final score = double.tryParse(textScore);
-              if (score == null || score < 0 || score > 100) {
-                UiUtils.showToast(dialogContext, 'Masukkan nilai valid antara 0 - 100', isError: true);
-                return;
-              }
-
-              try {
-                await widget.teacherServices.gradeSubmission(
-                  tugasId: _selectedTugasId,
-                  studentId: studentId,
-                  nilai: score,
-                  catatanDosen: feedbackController.text.trim(),
-                );
-                if (mounted) {
-                  widget.onShowToast('Nilai untuk $studentName berhasil disimpan ke database!');
-                  widget.onRefresh();
-                  _loadStudentsForSelectedTugas();
-                }
-                if (dialogContext.mounted) {
-                  Navigator.pop(dialogContext);
-                }
-              } catch (e) {
-                if (dialogContext.mounted) {
-                  widget.onShowToast('Gagal menyimpan nilai: $e', isError: true);
-                }
-              }
-            },
-            child: const Text('Simpan Nilai', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -19,15 +19,20 @@ class QuickActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tileBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final tileBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: tileBg,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: tileBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,17 +46,17 @@ class QuickActionTile extends StatelessWidget {
             const Spacer(),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
-                color: Color(0xFF0F172A),
+                color: titleColor,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

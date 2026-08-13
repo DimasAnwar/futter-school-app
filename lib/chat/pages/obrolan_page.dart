@@ -116,22 +116,30 @@ class _ObrolanPageState extends State<ObrolanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final searchFill = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: scaffoldBg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardBg,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.chat_bubble_rounded, color: Color(0xFF2563EB), size: 24),
-            SizedBox(width: 10),
+            const Icon(Icons.chat_bubble_rounded, color: Color(0xFF2563EB), size: 24),
+            const SizedBox(width: 10),
             Text(
               'Obrolan & Diskusi',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: textColor,
               ),
             ),
           ],
@@ -151,22 +159,23 @@ class _ObrolanPageState extends State<ObrolanPage> {
         children: [
           // Search & Filter Box
           Container(
-            color: Colors.white,
+            color: cardBg,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
                 TextField(
                   onChanged: (val) => setState(() => _searchQuery = val),
+                  style: TextStyle(color: textColor, fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Cari percakapan atau kontak...',
                     hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
                     prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8), size: 20),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     filled: true,
-                    fillColor: const Color(0xFFF1F5F9),
+                    fillColor: searchFill,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: isDark ? const BorderSide(color: Color(0xFF334155)) : BorderSide.none,
                     ),
                   ),
                 ),
@@ -184,12 +193,12 @@ class _ObrolanPageState extends State<ObrolanPage> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                              color: isSelected ? Colors.white : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                             ),
                           ),
                           selected: isSelected,
                           selectedColor: const Color(0xFF2563EB),
-                          backgroundColor: const Color(0xFFF1F5F9),
+                          backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                           onSelected: (_) => setState(() => _selectedFilter = filter),
                         ),
                       );
@@ -212,7 +221,7 @@ class _ObrolanPageState extends State<ObrolanPage> {
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: _filteredChats.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                    separatorBuilder: (context, index) => Divider(height: 1, color: dividerColor),
                     itemBuilder: (context, index) {
                       final chat = _filteredChats[index];
                       final name = chat['name'] as String;
@@ -253,7 +262,7 @@ class _ObrolanPageState extends State<ObrolanPage> {
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF10B981),
                                           shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 2),
+                                          border: Border.all(color: isDark ? const Color(0xFF1E293B) : Colors.white, width: 2),
                                         ),
                                       ),
                                     ),
@@ -270,10 +279,10 @@ class _ObrolanPageState extends State<ObrolanPage> {
                                         Expanded(
                                           child: Text(
                                             name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFF0F172A),
+                                              color: textColor,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -284,7 +293,7 @@ class _ObrolanPageState extends State<ObrolanPage> {
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: unreadCount > 0
-                                                ? const Color(0xFF2563EB)
+                                                ? const Color(0xFF3B82F6)
                                                 : const Color(0xFF94A3B8),
                                             fontWeight: unreadCount > 0
                                                 ? FontWeight.bold
@@ -302,8 +311,8 @@ class _ObrolanPageState extends State<ObrolanPage> {
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: unreadCount > 0
-                                                  ? const Color(0xFF0F172A)
-                                                  : const Color(0xFF64748B),
+                                                  ? textColor
+                                                  : subTextColor,
                                               fontWeight: unreadCount > 0
                                                   ? FontWeight.w600
                                                   : FontWeight.normal,
@@ -403,17 +412,27 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final appBarBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final incomingBubbleBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final incomingBubbleText = isDark ? Colors.white : const Color(0xFF0F172A);
+    final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final fieldFill = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     final name = widget.chat['name'] as String;
     final isOnline = widget.chat['isOnline'] as bool;
     final colorVal = widget.chat['avatarColor'] as int;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: scaffoldBg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: appBarBg,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
+          icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -433,7 +452,7 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
@@ -472,7 +491,7 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: isMe ? const Color(0xFF2563EB) : Colors.white,
+                      color: isMe ? const Color(0xFF2563EB) : incomingBubbleBg,
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(16),
                         topRight: const Radius.circular(16),
@@ -492,7 +511,7 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2563EB),
+                              color: Color(0xFF3B82F6),
                             ),
                           ),
                         if (!isMe) const SizedBox(height: 2),
@@ -500,7 +519,7 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
                           text,
                           style: TextStyle(
                             fontSize: 13,
-                            color: isMe ? Colors.white : const Color(0xFF0F172A),
+                            color: isMe ? Colors.white : incomingBubbleText,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -522,15 +541,15 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
           // Message Input Container
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+            decoration: BoxDecoration(
+              color: inputBg,
+              border: Border(top: BorderSide(color: borderColor)),
             ),
             child: SafeArea(
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.attach_file_rounded, color: Color(0xFF64748B)),
+                    icon: const Icon(Icons.attach_file_rounded, color: Color(0xFF94A3B8)),
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Fitur kirim lampiran dokumen siap digunakan.')),
@@ -541,15 +560,16 @@ class _ChatRoomPageState extends State<_ChatRoomPage> {
                     child: TextField(
                       controller: _msgController,
                       onSubmitted: (_) => _sendMessage(),
+                      style: TextStyle(color: textColor, fontSize: 13),
                       decoration: InputDecoration(
                         hintText: 'Tulis pesan...',
                         hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         filled: true,
-                        fillColor: const Color(0xFFF1F5F9),
+                        fillColor: fieldFill,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
+                          borderSide: isDark ? const BorderSide(color: Color(0xFF334155)) : BorderSide.none,
                         ),
                       ),
                     ),

@@ -12,10 +12,14 @@ class AdminBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final navBorder = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(
+        color: navBg,
+        border: Border(top: BorderSide(color: navBorder)),
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
@@ -26,7 +30,7 @@ class AdminBottomNav extends StatelessWidget {
         selectedFontSize: 12,
         unselectedFontSize: 12,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: navBg,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_view_rounded),

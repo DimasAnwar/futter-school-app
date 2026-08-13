@@ -1,3 +1,4 @@
+import 'package:bestpractice/common/theme/theme_controller.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
 import 'package:bestpractice/services/auth_services.dart';
@@ -141,24 +142,28 @@ class _ProfilPageState extends State<ProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
     final nameStr = _nameController.text.isNotEmpty ? _nameController.text : widget.fullName;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardBg,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.person_rounded, color: Color(0xFF2563EB), size: 24),
-            SizedBox(width: 10),
+            const Icon(Icons.person_rounded, color: Color(0xFF2563EB), size: 24),
+            const SizedBox(width: 10),
             Text(
               'Profil Pengguna',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: textColor,
               ),
             ),
           ],
@@ -179,42 +184,18 @@ class _ProfilPageState extends State<ProfilPage> {
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x332563EB), blurRadius: 12, offset: Offset(0, 4)),
+                  BoxShadow(color: Color(0x1A2563EB), blurRadius: 12, offset: Offset(0, 4)),
                 ],
               ),
               child: Row(
                 children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 36,
-                        backgroundColor: Colors.white,
-                        child: CircleAvatar(
-                          radius: 33,
-                          backgroundColor: const Color(0xFFEFF6FF),
-                          child: Text(
-                            nameStr.isEmpty ? 'U' : nameStr[0].toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2563EB),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
-                        ),
-                      ),
-                    ],
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
+                    child: Text(
+                      nameStr.isNotEmpty ? nameStr[0].toUpperCase() : 'U',
+                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -223,36 +204,28 @@ class _ProfilPageState extends State<ProfilPage> {
                       children: [
                         Text(
                           nameStr,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
+                        Text(
+                          widget.userEmail,
+                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.85)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: Colors.white.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             'Peran: ${widget.userRole}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          widget.userEmail,
-                          style: const TextStyle(fontSize: 12, color: Colors.white70),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -261,13 +234,13 @@ class _ProfilPageState extends State<ProfilPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // Form Edit Profile
+            // Account Info Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardBg,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: const [
                   BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
@@ -276,9 +249,9 @@ class _ProfilPageState extends State<ProfilPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Informasi Akun & Data Diri',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
                   ),
                   const SizedBox(height: 16),
                   CustomFormField(
@@ -335,7 +308,7 @@ class _ProfilPageState extends State<ProfilPage> {
             // Settings Section
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardBg,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: const [
                   BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
@@ -345,25 +318,28 @@ class _ProfilPageState extends State<ProfilPage> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.lock_outline_rounded, color: Color(0xFF2563EB)),
-                    title: const Text('Ubah Kata Sandi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    title: Text('Ubah Kata Sandi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
                     onTap: _showChangePasswordDialog,
                   ),
-                  const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                  Divider(height: 1, color: dividerColor),
                   SwitchListTile(
                     secondary: const Icon(Icons.notifications_none_rounded, color: Color(0xFF2563EB)),
-                    title: const Text('Notifikasi Aplikasi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    title: Text('Notifikasi Aplikasi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
                     value: _isNotificationEnabled,
                     activeTrackColor: const Color(0xFF2563EB),
                     onChanged: (val) => setState(() => _isNotificationEnabled = val),
                   ),
-                  const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                  Divider(height: 1, color: dividerColor),
                   SwitchListTile(
                     secondary: const Icon(Icons.dark_mode_outlined, color: Color(0xFF2563EB)),
-                    title: const Text('Mode Gelap (Tampilan)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    value: _isDarkModeEnabled,
+                    title: Text('Mode Gelap (Tampilan)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
+                    value: ThemeController.instance.isDarkMode,
                     activeTrackColor: const Color(0xFF2563EB),
-                    onChanged: (val) => setState(() => _isDarkModeEnabled = val),
+                    onChanged: (val) {
+                      setState(() => _isDarkModeEnabled = val);
+                      ThemeController.instance.toggleDarkMode(val);
+                    },
                   ),
                 ],
               ),

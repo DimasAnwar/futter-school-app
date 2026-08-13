@@ -18,16 +18,21 @@ class CardContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultBg = isDark ? const Color(0xFF1E294D) : Colors.white;
+    final defaultBorder = isDark ? const Color(0xFF2563EB).withValues(alpha: 0.35) : const Color(0xFFF1F5F9);
+    final effectiveBorder = borderColor == const Color(0xFFF1F5F9) ? defaultBorder : borderColor;
+
     return Container(
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: defaultBg,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: effectiveBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
+            color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.015),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

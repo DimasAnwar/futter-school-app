@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/card_container.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
@@ -10,11 +12,17 @@ class TeacherSubmissionDetailPage extends StatefulWidget {
     required this.submission,
     required this.tugasTitle,
     required this.courseName,
+    this.studentName,
+    this.studentEmail,
+    this.studentNim,
   });
 
   final Map<String, dynamic> submission;
   final String tugasTitle;
   final String courseName;
+  final String? studentName;
+  final String? studentEmail;
+  final String? studentNim;
 
   @override
   State<TeacherSubmissionDetailPage> createState() => _TeacherSubmissionDetailPageState();
@@ -28,6 +36,32 @@ class _TeacherSubmissionDetailPageState extends State<TeacherSubmissionDetailPag
   void initState() {
     super.initState();
     _currentSubmission = Map<String, dynamic>.from(widget.submission);
+    _loadProfileIfMissing();
+  }
+
+  Future<void> _loadProfileIfMissing() async {
+    final profileMap = _currentSubmission['profiles'] as Map<String, dynamic>?;
+    final studentId = _currentSubmission['student_id'] as String?;
+
+    if ((profileMap == null || profileMap['full_name'] == null || profileMap['nim'] == null) &&
+        studentId != null &&
+        studentId.isNotEmpty) {
+      try {
+        final profile = await Supabase.instance.client
+            .from('profiles')
+            .select('id, full_name, email, nim')
+            .eq('id', studentId)
+            .maybeSingle();
+
+        if (profile != null && mounted) {
+          setState(() {
+            _currentSubmission['profiles'] = profile;
+          });
+        }
+      } catch (e) {
+        if (kDebugMode) print('Error loading student profile in submission detail: $e');
+      }
+    }
   }
 
   String _formatDate(String? rawDate) {
@@ -163,9 +197,14 @@ class _TeacherSubmissionDetailPageState extends State<TeacherSubmissionDetailPag
     final tugasMap = _currentSubmission['tugas'] as Map<String, dynamic>?;
     final courseMap = tugasMap?['mata_kuliah'] as Map<String, dynamic>?;
 
-    final studentName = (profileMap?['full_name'] as String?) ?? 'Mahasiswa';
-    final studentEmail = (profileMap?['email'] as String?) ?? '-';
-    final studentNim = (profileMap?['nim'] as String?) ?? '-';
+    final rawName = widget.studentName ?? profileMap?['full_name'] as String?;
+    final studentName = (rawName != null && rawName.trim().isNotEmpty) ? rawName.trim() : 'Siswa';
+
+    final rawEmail = widget.studentEmail ?? profileMap?['email'] as String?;
+    final studentEmail = (rawEmail != null && rawEmail.trim().isNotEmpty) ? rawEmail.trim() : '-';
+
+    final rawNim = widget.studentNim ?? profileMap?['nim'] as String?;
+    final studentNim = (rawNim != null && rawNim.trim().isNotEmpty) ? rawNim.trim() : '-';
 
     final tugasTitle = (tugasMap?['judul_tugas'] as String?) ?? widget.tugasTitle;
     final courseName = (courseMap?['nama_mk'] as String?) ?? widget.courseName;
@@ -184,6 +223,11 @@ class _TeacherSubmissionDetailPageState extends State<TeacherSubmissionDetailPag
     final nilai = _currentSubmission['nilai'];
     final isGraded = _currentSubmission['status'] == 'graded' || nilai != null;
     final catatanDosen = _currentSubmission['catatan_dosen'] as String? ?? '';
+
+    final subInfo = [
+      if (studentNim != '-') 'NIM: $studentNim',
+      if (studentEmail != '-') studentEmail,
+    ].join(' • ');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -230,7 +274,7 @@ class _TeacherSubmissionDetailPageState extends State<TeacherSubmissionDetailPag
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'NIM: $studentNim • $studentEmail',
+                                subInfo.isEmpty ? 'NIM: Belum Diatur' : subInfo,
                                 style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                               ),
                             ],

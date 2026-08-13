@@ -12,11 +12,15 @@ class TeacherBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final navBorder = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
-        boxShadow: [
+      decoration: BoxDecoration(
+        color: navBg,
+        border: Border(top: BorderSide(color: navBorder)),
+        boxShadow: const [
           BoxShadow(
             color: Color(0x0D000000),
             blurRadius: 10,
@@ -34,7 +38,7 @@ class TeacherBottomNav extends StatelessWidget {
         unselectedFontSize: 12,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: navBg,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_view_outlined),

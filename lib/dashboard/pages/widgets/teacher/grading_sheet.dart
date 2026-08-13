@@ -1,8 +1,5 @@
-import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/teacher/teacher_submission_detail_page.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/card_container.dart';
-import 'package:bestpractice/dashboard/pages/widgets/admin/custom_buttons.dart';
-import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/empty_state.dart';
 import 'package:bestpractice/services/teacher_services.dart';
 import 'package:flutter/material.dart';
@@ -66,8 +63,8 @@ class GradingSheet extends StatelessWidget {
                       final submission = taskSubmissions[index];
                       final studentId = submission['student_id'] as String? ?? '';
                       final profileMap = submission['profiles'] as Map<String, dynamic>?;
-                      final studentMap = students.firstWhere(
-                        (s) => s['id'] == studentId,
+                      final studentMap = students.cast<Map<String, dynamic>>().firstWhere(
+                        (s) => s['id']?.toString().trim().toLowerCase() == studentId.trim().toLowerCase(),
                         orElse: () => profileMap ?? <String, dynamic>{},
                       );
 
@@ -183,6 +180,9 @@ class GradingSheet extends StatelessWidget {
                                           submission: submission,
                                           tugasTitle: tugasTitle,
                                           courseName: 'Mata Kuliah',
+                                          studentName: studentName,
+                                          studentEmail: studentEmail,
+                                          studentNim: studentNim,
                                         ),
                                       ),
                                     );
@@ -191,11 +191,6 @@ class GradingSheet extends StatelessWidget {
                                   icon: const Icon(Icons.description_rounded, size: 16),
                                   label: const Text('Detail & Beri Nilai', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                 ),
-                                const SizedBox(width: 8),
-                                PrimaryButton(
-                                  label: isGraded ? 'Edit Nilai' : 'Beri Nilai',
-                                  onPressed: () => _openGradeInputDialog(context, studentId, studentName, submission),
-                                ),
                               ],
                             ),
                           ],
@@ -203,80 +198,6 @@ class GradingSheet extends StatelessWidget {
                       );
                     },
                   ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _openGradeInputDialog(
-    BuildContext context,
-    String studentId,
-    String studentName,
-    Map<String, dynamic> submission,
-  ) {
-    final gradeController = TextEditingController(
-      text: submission['nilai'] != null ? submission['nilai'].toString() : '',
-    );
-    final feedbackController = TextEditingController(
-      text: submission['catatan_dosen'] as String? ?? '',
-    );
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Beri Nilai - $studentName'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomFormField(
-              controller: gradeController,
-              label: 'Nilai (0 - 100)',
-              hintText: 'Contoh: 85',
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            CustomFormField(
-              controller: feedbackController,
-              label: 'Catatan / Feedback Dosen',
-              hintText: 'Pekerjaan sangat baik, pertahankan...',
-              maxLines: 2,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Batal')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981)),
-            onPressed: () async {
-              final textScore = gradeController.text.trim();
-              final score = double.tryParse(textScore);
-              if (score == null || score < 0 || score > 100) {
-                UiUtils.showToast(dialogContext, 'Masukkan nilai valid antara 0 - 100', isError: true);
-                return;
-              }
-
-              try {
-                await teacherServices.gradeSubmission(
-                  tugasId: tugasId,
-                  studentId: studentId,
-                  nilai: score,
-                  catatanDosen: feedbackController.text.trim(),
-                );
-                if (dialogContext.mounted) {
-                  UiUtils.showToast(dialogContext, 'Nilai $studentName berhasil disimpan!');
-                  onRefreshDetails();
-                  Navigator.pop(dialogContext);
-                }
-              } catch (e) {
-                if (dialogContext.mounted) {
-                  UiUtils.showToast(dialogContext, 'Gagal menyimpan nilai: $e', isError: true);
-                }
-              }
-            },
-            child: const Text('Simpan Nilai', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

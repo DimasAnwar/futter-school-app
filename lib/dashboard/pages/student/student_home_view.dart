@@ -67,6 +67,9 @@ class StudentHomeView extends StatelessWidget {
     final formattedName = _toTitleCase(fullName);
     final formattedJurusan = _toTitleCase(jurusan);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
@@ -85,16 +88,16 @@ class StudentHomeView extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF64748B),
+                        color: Color(0xFF94A3B8),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       formattedName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: textColor,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -297,19 +300,19 @@ class StudentHomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                children: const [
-                  Icon(
+                children: [
+                  const Icon(
                     Icons.assignment_rounded,
                     color: Color(0xFF2563EB),
                     size: 22,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Tugas Kuliah Aktif',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: textColor,
                     ),
                   ),
                 ],

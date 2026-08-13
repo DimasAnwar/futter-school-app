@@ -32,21 +32,24 @@ class TeacherHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         children: [
-          // Header Row with Profile & Logout
+          // Top Header Bar: User Info & Notification Button
           Row(
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: const Color(0xFFDCE8FF),
+                backgroundColor: const Color(0xFF2563EB),
                 child: Text(
                   fullName.isEmpty ? 'D' : fullName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Color(0xFF2563EB),
+                    color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -59,10 +62,10 @@ class TeacherHomeView extends StatelessWidget {
                   children: [
                     Text(
                       'Halo, $fullName',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: textColor,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -75,7 +78,7 @@ class TeacherHomeView extends StatelessWidget {
                 onPressed: () => onShowToast('Tidak ada notifikasi baru.'),
                 icon: const Icon(
                   Icons.notifications_none_rounded,
-                  color: Color(0xFF64748B),
+                  color: Color(0xFF94A3B8),
                 ),
                 tooltip: 'Notifikasi',
               ),
@@ -129,19 +132,19 @@ class TeacherHomeView extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
 
-          // --- PENGUMUMAN CAROUSEL SLIDER ---
-          const Row(
+          // Pengumuman Kampus Section
+          Row(
             children: [
-              Icon(Icons.campaign_rounded, color: Color(0xFFF59E0B), size: 22),
-              SizedBox(width: 8),
+              const Icon(Icons.campaign_rounded, color: Color(0xFFF59E0B), size: 22),
+              const SizedBox(width: 8),
               Text(
                 'Pengumuman Kampus',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: textColor,
                 ),
               ),
             ],
@@ -155,12 +158,12 @@ class TeacherHomeView extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Section Title
-          const Text(
+          Text(
             'Statistik Pengajaran',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0F172A),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -173,34 +176,40 @@ class TeacherHomeView extends StatelessWidget {
                   icon: Icons.class_rounded,
                   value: '$courseCount',
                   label: 'Total Matkul',
+                  color: const Color(0xFF2563EB),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: StatCard(
-                  icon: Icons.groups_rounded,
+                  icon: Icons.people_alt_rounded,
                   value: '$totalStudentsCount',
-                  label: 'Jumlah Siswa',
+                  label: 'Siswa Terdaftar',
+                  color: const Color(0xFF10B981),
                 ),
               ),
             ],
           ),
+
           const SizedBox(height: 12),
+
           Row(
             children: [
               Expanded(
                 child: StatCard(
                   icon: Icons.folder_copy_rounded,
                   value: '$materiCount',
-                  label: 'Total Materi',
+                  label: 'Materi Diunggah',
+                  color: const Color(0xFF8B5CF6),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: StatCard(
-                  icon: Icons.assignment_rounded,
+                  icon: Icons.assignment_turned_in_rounded,
                   value: '$tugasCount',
-                  label: 'Total Tugas',
+                  label: 'Tugas Diberikan',
+                  color: const Color(0xFFF59E0B),
                 ),
               ),
             ],
@@ -214,12 +223,12 @@ class TeacherHomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Menu Cepat Dosen',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 14),

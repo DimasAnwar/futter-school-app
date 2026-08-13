@@ -16,12 +16,18 @@ class InfoStatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final boxBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final boxBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final valueColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final labelColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: boxBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: boxBorder),
       ),
       child: Row(
         children: [
@@ -32,11 +38,11 @@ class InfoStatBox extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: valueColor),
               ),
               Text(
                 label,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 11, color: labelColor),
               ),
             ],
           ),
