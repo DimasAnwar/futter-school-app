@@ -39,6 +39,14 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final iconBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final avatarBg = isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5);
+    final avatarText = isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -51,7 +59,7 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -64,7 +72,7 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                  color: iconBg,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.people_alt_rounded, color: Color(0xFF2563EB), size: 20),
@@ -74,17 +82,17 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Siswa Terdaftar',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: titleColor,
                       ),
                     ),
                     Text(
                       widget.courseName,
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      style: TextStyle(fontSize: 12, color: subtitleColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -92,7 +100,7 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B)),
+                icon: Icon(Icons.close_rounded, color: subtitleColor),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
@@ -132,7 +140,7 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
 
                 return ListView.separated(
                   itemCount: filtered.length,
-                  separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 1),
+                  separatorBuilder: (context, index) => Divider(color: dividerColor, height: 1),
                   itemBuilder: (context, index) {
                     final student = filtered[index];
                     final id = student['id'] as String;
@@ -145,15 +153,15 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
                         children: [
                           CircleAvatar(
                             radius: 18,
-                            backgroundColor: const Color(0xFFD1FAE5),
+                            backgroundColor: avatarBg,
                             child: Text(
                               name
                                   .split(' ')
                                   .map((e) => e.isEmpty ? '' : e[0])
                                   .take(2)
                                   .join(),
-                              style: const TextStyle(
-                                color: Color(0xFF047857),
+                              style: TextStyle(
+                                color: avatarText,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -166,16 +174,16 @@ class _ManageCourseStudentsSheetState extends State<ManageCourseStudentsSheet> {
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: Color(0xFF0F172A),
+                                    color: titleColor,
                                   ),
                                 ),
                                 if (email.isNotEmpty)
                                   Text(
                                     email,
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                                    style: TextStyle(fontSize: 11, color: subtitleColor),
                                   ),
                               ],
                             ),

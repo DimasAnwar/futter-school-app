@@ -36,6 +36,8 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,12 +45,12 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Pengumuman Terbaru',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             TextButton(
@@ -129,8 +131,8 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: isUrgent
-                                          ? const Color(0xFFFEE2E2)
-                                          : const Color(0xFFEFF6FF),
+                                          ? (isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2))
+                                          : (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF)),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -151,10 +153,10 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
                                       children: [
                                         Text(
                                           title,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
-                                            color: Color(0xFF0F172A),
+                                            color: isDark ? Colors.white : const Color(0xFF0F172A),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -176,7 +178,7 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFEE2E2),
+                                        color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: const Text(
@@ -192,14 +194,14 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              const Divider(color: Color(0xFFF1F5F9), height: 1),
+                              Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9), height: 1),
                               const SizedBox(height: 10),
                               Expanded(
                                 child: Text(
                                   body,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
-                                    color: Color(0xFF334155),
+                                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                                     height: 1.35,
                                   ),
                                   maxLines: 3,
@@ -228,7 +230,7 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? const Color(0xFF2563EB)
-                              : const Color(0xFFCBD5E1),
+                              : (isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),

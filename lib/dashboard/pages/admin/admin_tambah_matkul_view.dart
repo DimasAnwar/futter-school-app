@@ -46,6 +46,11 @@ class _AdminTambahMatkulViewState extends State<AdminTambahMatkulView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final inputBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final inputBorderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
     final charCount = _descriptionController.text.length;
 
     return Column(
@@ -63,9 +68,9 @@ class _AdminTambahMatkulViewState extends State<AdminTambahMatkulView> {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             children: [
-              const Text(
+              Text(
                 'Masukkan rincian mata kuliah baru di bawah ini untuk menambahkannya ke kurikulum.',
-                style: TextStyle(fontSize: 14, color: Color(0xFF64748B), height: 1.4),
+                style: TextStyle(fontSize: 14, color: subtitleColor, height: 1.4),
               ),
               const SizedBox(height: 20),
 
@@ -97,27 +102,29 @@ class _AdminTambahMatkulViewState extends State<AdminTambahMatkulView> {
                       const SizedBox(height: 18),
 
                       // Field 3: Pilih Departemen
-                      const Text(
+                      Text(
                         'Pilih Departemen',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: titleColor),
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: _selectedDepartment,
+                        dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                         onChanged: (val) => setState(() => _selectedDepartment = val),
+                        style: TextStyle(color: titleColor, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Pilih Departemen...',
                           hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                           prefixIcon: const Icon(Icons.account_balance_outlined, color: Color(0xFF94A3B8)),
                           filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
+                          fillColor: inputBg,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                            borderSide: BorderSide(color: inputBorderColor),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
-                            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                            borderSide: BorderSide(color: inputBorderColor),
                           ),
                         ),
                         items: const [

@@ -14,15 +14,20 @@ class AccessTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tileBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final tileBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: tileBg,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: tileBorder),
         ),
         child: Row(
           children: [
@@ -30,10 +35,10 @@ class AccessTile extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: Color(0xFF0F172A),
+                color: titleColor,
               ),
             ),
             const Spacer(),

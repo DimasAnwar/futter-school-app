@@ -48,6 +48,14 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final iconBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final avatarBg = isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5);
+    final avatarText = isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857);
+
     final isDosenMode = widget.participantType == 'Dosen';
 
     final selectedCourse = widget.courses.cast<Map<String, dynamic>>().firstWhere(
@@ -101,8 +109,8 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
               trailing: Container(
                 width: 40,
                 height: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEFF6FF),
+                decoration: BoxDecoration(
+                  color: iconBg,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -131,12 +139,12 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '1. Pilih Mata Kuliah',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: titleColor,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -186,13 +194,13 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFFEFF6FF)
-                                : Colors.white,
+                                ? (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF))
+                                : (isDark ? const Color(0xFF0F172A) : Colors.white),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF2563EB)
-                                  : const Color(0xFFE2E8F0),
+                                  ? (isDark ? const Color(0xFF3B82F6) : const Color(0xFF2563EB))
+                                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                               width: isSelected ? 1.5 : 1.0,
                             ),
                           ),
@@ -222,16 +230,16 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
                                         color: isSelected
-                                            ? const Color(0xFF1E40AF)
-                                            : const Color(0xFF0F172A),
+                                            ? (isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF))
+                                            : titleColor,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       '$code • $sem',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFF64748B),
+                                        color: subtitleColor,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -286,10 +294,10 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                     children: [
                       Text(
                         isDosenMode ? '2. Pilih Dosen' : '2. Pilih Siswa',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: titleColor,
                         ),
                       ),
                       if (isDosenMode)
@@ -299,7 +307,7 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
+                            color: isDark ? const Color(0xFF78350F) : const Color(0xFFFEF3C7),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
@@ -320,9 +328,9 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
+                        color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                        border: Border.all(color: isDark ? const Color(0xFF2563EB) : const Color(0xFFBFDBFE)),
                       ),
                       child: Row(
                         children: [
@@ -336,19 +344,19 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Dosen Pengampu Saat Ini:',
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Color(0xFF1E40AF),
+                                    color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
                                   ),
                                 ),
                                 Text(
                                   currentDosenName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1E3A8A),
+                                    color: titleColor,
                                   ),
                                 ),
                               ],
@@ -365,7 +373,7 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: const Color(0xFFDC2626),
-                              side: const BorderSide(color: Color(0xFFFCA5A5)),
+                              side: BorderSide(color: isDark ? const Color(0xFFEF4444) : const Color(0xFFFCA5A5)),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                                 vertical: 6,
@@ -420,16 +428,16 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                         },
                         activeColor: const Color(0xFF2563EB),
                       ),
-                      const Text(
+                      Text(
                         'Pilih Semua',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F172A),
+                          color: titleColor,
                         ),
                       ),
                     ],
                   ),
-                  const Divider(color: Color(0xFFF1F5F9)),
+                  Divider(color: dividerColor),
 
                   // Participant items list
                   if (filteredParticipants.isEmpty)
@@ -464,15 +472,15 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                             const SizedBox(width: 4),
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: const Color(0xFFD1FAE5),
+                              backgroundColor: avatarBg,
                               child: Text(
                                 name
                                     .split(' ')
                                     .map((e) => e.isEmpty ? '' : e[0])
                                     .take(2)
                                     .join(),
-                                style: const TextStyle(
-                                  color: Color(0xFF047857),
+                                style: TextStyle(
+                                  color: avatarText,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
@@ -485,17 +493,17 @@ class _AdminPenugasanViewState extends State<AdminPenugasanView> {
                                 children: [
                                   Text(
                                     name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      color: Color(0xFF0F172A),
+                                      color: titleColor,
                                     ),
                                   ),
                                   Text(
                                     email,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: Color(0xFF64748B),
+                                      color: subtitleColor,
                                     ),
                                   ),
                                 ],

@@ -35,6 +35,12 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final bodyColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       children: [
@@ -82,15 +88,15 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
                     children: [
                       const Icon(Icons.info_outline_rounded, size: 36, color: Color(0xFF3B82F6)),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         'Belum dapat memuat pengumuman realtime.',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: titleColor),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${snapshot.error}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        style: TextStyle(fontSize: 12, color: subtitleColor),
                       ),
                     ],
                   ),
@@ -139,7 +145,9 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: isUrgent ? const Color(0xFFFEE2E2) : const Color(0xFFEFF6FF),
+                                color: isUrgent
+                                    ? (isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2))
+                                    : (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF)),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -158,10 +166,10 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
                                       Expanded(
                                         child: Text(
                                           title,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
-                                            color: Color(0xFF0F172A),
+                                            color: titleColor,
                                           ),
                                         ),
                                       ),
@@ -170,7 +178,7 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFFEE2E2),
+                                            color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: const Text(
@@ -200,13 +208,13 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Divider(color: Color(0xFFF1F5F9), height: 1),
+                        Divider(color: dividerColor, height: 1),
                         const SizedBox(height: 12),
                         Text(
                           body,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF334155),
+                            color: bodyColor,
                             height: 1.45,
                           ),
                         ),

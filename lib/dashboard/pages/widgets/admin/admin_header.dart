@@ -13,6 +13,8 @@ class AdminHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         const CircleAvatar(
@@ -33,8 +35,8 @@ class AdminHeader extends StatelessWidget {
         Container(
           width: 40,
           height: 40,
-          decoration: const BoxDecoration(
-            color: Color(0xFFEFF6FF),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -51,7 +53,7 @@ class AdminHeader extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton(
             onPressed: () => AuthServices().logoutAkun(),
-            icon: const Icon(Icons.logout_rounded, color: Color(0xFF64748B)),
+            icon: Icon(Icons.logout_rounded, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
           ),
         ],
       ],

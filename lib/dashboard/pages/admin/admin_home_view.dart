@@ -26,6 +26,8 @@ class AdminHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return RefreshIndicator(
       onRefresh: onRefresh,
       child: ListView(
@@ -73,12 +75,12 @@ class AdminHomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Penugasan Akses',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 14),

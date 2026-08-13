@@ -40,6 +40,17 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final bannerBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final bannerBorder = isDark ? const Color(0xFF2563EB) : const Color(0xFFDBEAFE);
+    final urgentIconBg = isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEE2E2);
+    final previewBoxBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final previewBorder = _isUrgentAnnouncement
+        ? (isDark ? const Color(0xFFDC2626) : const Color(0xFFFCA5A5))
+        : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0));
+
     final titleText = _announcementTitleController.text;
     final bodyText = _announcementContentController.text;
 
@@ -83,16 +94,16 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                  color: bannerBg,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFDBEAFE)),
+                  border: Border.all(color: bannerBorder),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFEE2E2),
+                      decoration: BoxDecoration(
+                        color: urgentIconBg,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -102,7 +113,7 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -111,13 +122,13 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
-                              color: Color(0xFF0F172A),
+                              color: titleColor,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
                             'Akan menonjolkan pengumuman ini.',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                            style: TextStyle(fontSize: 11, color: subtitleColor),
                           ),
                         ],
                       ),
@@ -153,12 +164,12 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: const [
-                  Icon(Icons.remove_red_eye_outlined, size: 20, color: Color(0xFF64748B)),
-                  SizedBox(width: 8),
+                children: [
+                  Icon(Icons.remove_red_eye_outlined, size: 20, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  const SizedBox(width: 8),
                   Text(
                     'Pratinjau Pengumuman',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF64748B)),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                   ),
                 ],
               ),
@@ -168,10 +179,10 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: previewBoxBg,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _isUrgentAnnouncement ? const Color(0xFFFCA5A5) : const Color(0xFFE2E8F0),
+                    color: previewBorder,
                     width: _isUrgentAnnouncement ? 1.5 : 1.0,
                   ),
                 ),
@@ -191,7 +202,7 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                           children: [
                             Text(
                               widget.fullName.isNotEmpty ? widget.fullName : 'Admin Sekolah',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: titleColor),
                             ),
                             const Text(
                               'Baru saja',
@@ -204,7 +215,7 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEE2E2),
+                              color: urgentIconBg,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -224,7 +235,7 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: titleText.isEmpty ? const Color(0xFF94A3B8) : const Color(0xFF0F172A),
+                        color: titleText.isEmpty ? const Color(0xFF94A3B8) : titleColor,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -232,7 +243,7 @@ class _AdminBuatPengumumanViewState extends State<AdminBuatPengumumanView> {
                       bodyText.isEmpty ? 'Isi pengumuman akan ditampilkan secara langsung saat Anda mengetik...' : bodyText,
                       style: TextStyle(
                         fontSize: 13,
-                        color: bodyText.isEmpty ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                        color: bodyText.isEmpty ? const Color(0xFF94A3B8) : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                         height: 1.4,
                       ),
                     ),

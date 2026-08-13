@@ -47,6 +47,12 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final cardIconBg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+
     final filteredCourses = widget.courses.where((c) {
       final query = _searchQuery.toLowerCase();
       final name = (c['nama_mk'] as String? ?? '').toLowerCase();
@@ -85,19 +91,19 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Pengelolaan Mata Kuliah',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: titleColor,
                 ),
               ),
               Text(
                 _searchQuery.trim().isEmpty
                     ? '${widget.courses.length} Total Mata Kuliah'
                     : '${filteredCourses.length} Ditemukan',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
               ),
             ],
           ),
@@ -115,26 +121,26 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
             CardContainer(
               padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
               child: Column(
-                children: const [
-                  Icon(
+                children: [
+                  const Icon(
                     Icons.search_rounded,
                     size: 40,
                     color: Color(0xFF94A3B8),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Cari Mata Kuliah',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
-                      color: Color(0xFF0F172A),
+                      color: titleColor,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Ketik nama atau kode mata kuliah pada kolom pencarian di atas untuk mengelola.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                    style: TextStyle(fontSize: 12, color: subtitleColor),
                   ),
                 ],
               ),
@@ -171,7 +177,7 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: cardIconBg,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(iconData, color: const Color(0xFF2563EB), size: 22),
@@ -183,16 +189,16 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
-                                    color: Color(0xFF0F172A),
+                                    color: titleColor,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '$code • $sks SKS • Sem $sem',
-                                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                  style: TextStyle(fontSize: 12, color: subtitleColor),
                                 ),
                               ],
                             ),
@@ -205,7 +211,7 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                       ),
 
                       const SizedBox(height: 12),
-                      const Divider(color: Color(0xFFF1F5F9)),
+                      Divider(color: dividerColor),
                       const SizedBox(height: 8),
 
                       // Dosen Pengampu Row
@@ -218,13 +224,13 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                                 ? Text.rich(
                                     TextSpan(
                                       text: 'Dosen: ',
-                                      style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                                      style: TextStyle(fontSize: 13, color: subtitleColor),
                                       children: [
                                         TextSpan(
                                           text: teacherName,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0F172A),
+                                            color: titleColor,
                                           ),
                                         ),
                                       ],
@@ -265,7 +271,7 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                             ElevatedButton(
                               onPressed: () => widget.onOpenPenugasanForCourse(id, 'Dosen'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFEFF6FF),
+                                backgroundColor: cardIconBg,
                                 foregroundColor: const Color(0xFF2563EB),
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -290,7 +296,7 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
                               label: const Text('Kelola / Hapus Siswa Terdaftar', style: TextStyle(fontSize: 12)),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: const Color(0xFF3B82F6),
-                                side: const BorderSide(color: Color(0xFFBFDBFE)),
+                                side: BorderSide(color: isDark ? const Color(0xFF2563EB) : const Color(0xFFBFDBFE)),
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
@@ -317,10 +323,12 @@ class _AdminAcademicsViewState extends State<AdminAcademicsView> {
   }
 
   void _showManageStudentsModal(BuildContext context, String courseId, String courseName) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
