@@ -44,7 +44,7 @@ class CustomFormField extends StatelessWidget {
   const CustomFormField({
     super.key,
     required this.label,
-    required this.hintText,
+    this.hintText = '',
     this.controller,
     this.prefixIcon,
     this.validator,
@@ -53,6 +53,7 @@ class CustomFormField extends StatelessWidget {
     this.counterText,
     this.onChanged,
     this.keyboardType,
+    this.obscureText = false,
   });
 
   final String label;
@@ -65,6 +66,7 @@ class CustomFormField extends StatelessWidget {
   final String? counterText;
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +84,7 @@ class CustomFormField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          obscureText: obscureText,
           validator: validator,
           maxLines: maxLines,
           maxLength: maxLength,

@@ -1,3 +1,4 @@
+import 'package:bestpractice/chat/pages/obrolan_page.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_academics_view.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_buat_pengumuman_view.dart';
@@ -6,10 +7,11 @@ import 'package:bestpractice/dashboard/pages/admin/admin_pengumuman_view.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_penugasan_view.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_tambah_matkul_view.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/admin_bottom_nav.dart';
+import 'package:bestpractice/profile/pages/profil_page.dart';
 import 'package:bestpractice/services/admin_services.dart';
 import 'package:flutter/material.dart';
 
-enum AdminScreen { home, academics, pengumuman, penugasan, tambahMatkul, buatPengumuman }
+enum AdminScreen { home, academics, pengumuman, penugasan, tambahMatkul, buatPengumuman, messages, profile }
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key, required this.fullName});
@@ -48,11 +50,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   Future<AdminDashboardData> _loadData() async {
     final data = await _adminServices.getDashboardData();
-
-    if (_selectedCourseId.isEmpty && data.courses.isNotEmpty) {
-      _selectedCourseId = data.courses.first['id'] as String;
-    }
-
     return data;
   }
 
@@ -100,15 +97,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: _buildBodyContent(),
-              ),
-            ),
-          ],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: _buildBodyContent(),
         ),
       ),
       bottomNavigationBar: AdminBottomNav(
@@ -127,6 +118,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             if (index == 2) {
               _currentScreen = AdminScreen.pengumuman;
               _previousScreen = AdminScreen.pengumuman;
+            }
+            if (index == 3) {
+              _currentScreen = AdminScreen.messages;
+              _previousScreen = AdminScreen.messages;
+            }
+            if (index == 4) {
+              _currentScreen = AdminScreen.profile;
+              _previousScreen = AdminScreen.profile;
             }
           });
         },
@@ -267,6 +266,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           fullName: widget.fullName,
           onSendAnnouncement: _handleSendAnnouncement,
           onShowNotification: () => _showToast('Tidak ada notifikasi baru.'),
+        );
+
+      case AdminScreen.messages:
+        return ObrolanPage(
+          currentUserRole: 'Administrator',
+          currentUserName: widget.fullName,
+        );
+
+      case AdminScreen.profile:
+        return ProfilPage(
+          fullName: widget.fullName,
+          userRole: 'Administrator',
+          userEmail: 'admin@kampus.ac.id',
         );
     }
   }

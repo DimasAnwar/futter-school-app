@@ -1,114 +1,168 @@
-import 'package:bestpractice/dashboard/pages/widgets/dashboard_widgets.dart';
-import 'package:bestpractice/services/auth_services.dart';
+import 'package:bestpractice/chat/pages/obrolan_page.dart';
+import 'package:bestpractice/common/utils/ui_utils.dart';
+import 'package:bestpractice/dashboard/pages/student/student_academics_view.dart';
+import 'package:bestpractice/dashboard/pages/student/student_home_view.dart';
+import 'package:bestpractice/dashboard/pages/widgets/student/student_bottom_nav.dart';
+import 'package:bestpractice/profile/pages/profil_page.dart';
+import 'package:bestpractice/services/student_services.dart';
 import 'package:flutter/material.dart';
 
-class StudentDashboardPage extends StatelessWidget {
+class StudentDashboardPage extends StatefulWidget {
   const StudentDashboardPage({super.key, required this.fullName});
 
   final String fullName;
 
   @override
-  Widget build(BuildContext context) {
-    return RoleDashboard(
-      fullName: fullName,
-      roleLabel: 'Student',
-      bannerTitle: 'Siap belajar hari ini?',
-      bannerSubtitle: 'Jangan lupa cek tugas dan materi terbaru.',
-      bannerIcon: Icons.school_rounded,
-      summaries: const [
-        ('4', 'Mata kuliah', Icons.menu_book_rounded, Color(0xFF2563EB)),
-        ('2', 'Tugas aktif', Icons.assignment_rounded, Color(0xFFF59E0B)),
-        ('86', 'Rata-rata nilai', Icons.grade_rounded, Color(0xFF10B981)),
-      ],
-      actions: const [
-        ('Mata kuliah', Icons.auto_stories_rounded, Color(0xFF2563EB)),
-        ('Tugas', Icons.assignment_rounded, Color(0xFFF59E0B)),
-        ('Materi', Icons.folder_copy_rounded, Color(0xFF8B5CF6)),
-        ('Nilai', Icons.bar_chart_rounded, Color(0xFF10B981)),
-      ],
-      activityTitle: 'Tugas terdekat',
-      activity: 'Pemrograman Mobile - dikumpulkan besok',
-    );
-  }
+  State<StudentDashboardPage> createState() => _StudentDashboardPageState();
 }
 
-class RoleDashboard extends StatelessWidget {
-  const RoleDashboard({
-    required this.fullName,
-    required this.roleLabel,
-    required this.bannerTitle,
-    required this.bannerSubtitle,
-    required this.bannerIcon,
-    required this.summaries,
-    required this.actions,
-    required this.activityTitle,
-    required this.activity,
-  });
+class _StudentDashboardPageState extends State<StudentDashboardPage> {
+  final StudentServices _studentServices = StudentServices();
 
-  final String fullName;
-  final String roleLabel;
-  final String bannerTitle;
-  final String bannerSubtitle;
-  final IconData bannerIcon;
-  final List<(String, String, IconData, Color)> summaries;
-  final List<(String, IconData, Color)> actions;
-  final String activityTitle;
-  final String activity;
+  int _currentNavIndex = 0;
+  late Future<StudentDashboardData> _dashboardData;
+  String _studentId = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _studentId = _studentServices.currentStudentId ?? '';
+    _refreshData();
+  }
+
+  void _refreshData() {
+    setState(() {
+      final currentId = _studentServices.currentStudentId ?? _studentId;
+      _studentId = currentId;
+      _dashboardData = _studentServices.getDashboardData(currentId);
+    });
+  }
+
+  void _showToast(String message, {bool isError = false}) {
+    UiUtils.showToast(context, message, isError: isError);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            DashboardHeader(
-              name: fullName,
-              roleLabel: roleLabel,
-              onLogout: () => AuthServices().logoutAkun(),
-            ),
-            const SizedBox(height: 24),
-            WelcomeBanner(title: bannerTitle, subtitle: bannerSubtitle, icon: bannerIcon),
-            const SizedBox(height: 22),
-            const Text('Ringkasan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 126,
-              child: Row(
-                children: [
-                  for (final item in summaries) ...[
-                    Expanded(child: SummaryCard(label: item.$2, value: item.$1, icon: item.$3, color: item.$4)),
-                    if (item != summaries.last) const SizedBox(width: 10),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 22),
-            const Text('Menu cepat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1.7,
-              children: [for (final item in actions) ActionTile(title: item.$1, icon: item.$2, color: item.$3)],
-            ),
-            const SizedBox(height: 22),
-            Text(activityTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            ListTile(
-              tileColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              leading: const CircleAvatar(child: Icon(Icons.notifications_active_outlined)),
-              title: Text(activity),
-              trailing: const Icon(Icons.chevron_right_rounded),
-            ),
-          ],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: _buildBodyContent(),
         ),
       ),
+      bottomNavigationBar: StudentBottomNav(
+        currentIndex: _currentNavIndex,
+        onTap: (index) {
+          setState(() {
+            _currentNavIndex = index;
+          });
+        },
+      ),
     );
+  }
+
+  Widget _buildBodyContent() {
+    switch (_currentNavIndex) {
+      case 0:
+        return FutureBuilder<StudentDashboardData>(
+          future: _dashboardData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const SizedBox(height: 12),
+                    Text('Gagal memuat data: ${snapshot.error}'),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _refreshData,
+                      child: const Text('Coba Lagi'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final data = snapshot.data ??
+                const StudentDashboardData(
+                  enrolledCourses: [],
+                  announcements: [],
+                  tugasList: [],
+                  materiList: [],
+                  submissions: [],
+                  totalSks: 0,
+                );
+
+            return StudentHomeView(
+              fullName: widget.fullName,
+              nim: data.nim,
+              jurusan: data.jurusan,
+              studentId: _studentId,
+              submissions: data.submissions,
+              totalSks: data.totalSks,
+              courseCount: data.courseCount,
+              tugasCount: data.tugasCount,
+              announcements: data.announcements,
+              tugasList: data.tugasList,
+              onRefresh: () async => _refreshData(),
+              onOpenAcademicsTab: () => setState(() => _currentNavIndex = 1),
+              onShowToast: _showToast,
+            );
+          },
+        );
+
+      case 1:
+        return FutureBuilder<StudentDashboardData>(
+          future: _dashboardData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final data = snapshot.data ??
+                const StudentDashboardData(
+                  enrolledCourses: [],
+                  announcements: [],
+                  tugasList: [],
+                  materiList: [],
+                  submissions: [],
+                  totalSks: 0,
+                );
+
+            return StudentAcademicsView(
+              studentId: _studentId,
+              enrolledCourses: data.enrolledCourses,
+              materiList: data.materiList,
+              tugasList: data.tugasList,
+              submissions: data.submissions,
+              onRefresh: () async => _refreshData(),
+              onShowToast: _showToast,
+            );
+          },
+        );
+
+      case 2:
+        return ObrolanPage(
+          currentUserRole: 'Mahasiswa',
+          currentUserName: widget.fullName,
+        );
+
+      case 3:
+        return ProfilPage(
+          fullName: widget.fullName,
+          userRole: 'Mahasiswa',
+          userEmail: _studentServices.currentStudentEmail ?? 'mahasiswa@kampus.ac.id',
+        );
+
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }
