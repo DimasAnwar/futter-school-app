@@ -65,6 +65,7 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
   Future<void> _pickDeadlineDateTime() async {
     final now = DateTime.now();
     final initialDate = _selectedDate ?? now.add(const Duration(days: 7));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final pickedDate = await showDatePicker(
       context: context,
@@ -75,11 +76,18 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFF59E0B),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF0F172A),
-            ),
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: Color(0xFFF59E0B),
+                    onPrimary: Colors.white,
+                    surface: Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: Color(0xFFF59E0B),
+                    onPrimary: Colors.white,
+                    onSurface: Color(0xFF0F172A),
+                  ),
           ),
           child: child!,
         );
@@ -96,11 +104,18 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFF59E0B),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF0F172A),
-            ),
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: Color(0xFFF59E0B),
+                    onPrimary: Colors.white,
+                    surface: Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: Color(0xFFF59E0B),
+                    onPrimary: Colors.white,
+                    onSurface: Color(0xFF0F172A),
+                  ),
           ),
           child: child!,
         );
@@ -200,22 +215,26 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEditMode = widget.existingTugas != null;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
+          icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           isEditMode ? 'Edit Tugas Perkuliahan' : 'Buat Penugasan Siswa',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: textColor,
           ),
         ),
       ),
@@ -236,8 +255,12 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x33F59E0B), blurRadius: 10, offset: Offset(0, 4)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0x33F59E0B),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: Row(
@@ -245,26 +268,26 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.add_task_rounded, color: Colors.white, size: 28),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Assign Tugas Baru',
-                            style: TextStyle(
+                            isEditMode ? 'Edit Tugas Perkuliahan' : 'Assign Tugas Baru',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
                           ),
-                          SizedBox(height: 2),
-                          Text(
+                          const SizedBox(height: 2),
+                          const Text(
                             'Berikan instruksi tugas, kriteria nilai, dan tentukan tanggal batas waktu pengumpulan.',
                             style: TextStyle(color: Colors.white70, fontSize: 12),
                           ),
@@ -280,41 +303,47 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0x08000000),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Pilih Mata Kuliah',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textColor),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       isExpanded: true,
+                      dropdownColor: cardBg,
+                      style: TextStyle(color: textColor, fontSize: 14),
                       initialValue: _selectedCourseId.isNotEmpty ? _selectedCourseId : null,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                         prefixIcon: const Icon(Icons.class_rounded, color: Color(0xFFF59E0B), size: 20),
                       ),
-                      hint: const Text('Pilih mata kuliah...'),
+                      hint: Text('Pilih mata kuliah...', style: TextStyle(color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8))),
                       items: widget.courses.map((course) {
                         final name = course['nama_mk'] as String? ?? 'Matkul';
                         final code = course['kode_mk'] as String? ?? '-';
                         return DropdownMenuItem<String>(
                           value: course['id'] as String,
-                          child: Text('$name ($code)', overflow: TextOverflow.ellipsis),
+                          child: Text('$name ($code)', style: TextStyle(color: textColor), overflow: TextOverflow.ellipsis),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -338,9 +367,9 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    const Text(
+                    Text(
                       'Deadline Pengumpulan Tugas',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textColor),
                     ),
                     const SizedBox(height: 8),
 
@@ -350,21 +379,25 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFFBEB),
+                          color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.6) : const Color(0xFFFFFBEB),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFFDE68A)),
+                          border: Border.all(color: isDark ? const Color(0xFF78350F) : const Color(0xFFFDE68A)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.calendar_today_rounded, color: Color(0xFFD97706), size: 22),
+                            Icon(Icons.calendar_today_rounded, color: isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706), size: 22),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'BATAS WAKTU PENGUMPULAN',
-                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFB45309)),
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? const Color(0xFFFDE047) : const Color(0xFFB45309),
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -374,13 +407,15 @@ class _AssignTugasPageState extends State<AssignTugasPage> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: _deadlineController.text.isEmpty ? const Color(0xFF94A3B8) : const Color(0xFF0F172A),
+                                      color: _deadlineController.text.isEmpty
+                                          ? (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8))
+                                          : textColor,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.access_time_rounded, color: Color(0xFFD97706), size: 20),
+                            Icon(Icons.access_time_rounded, color: isDark ? const Color(0xFFFDE047) : const Color(0xFFD97706), size: 20),
                           ],
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:bestpractice/auth/pages/widgets/role_selector.dart';
+import 'package:bestpractice/common/theme/app_colors.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
@@ -36,10 +37,12 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _prosesRegister() async {
     final fullName = _fullnameController.text.trim();
     final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final confirmPassword = _confirmController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmController.text;
     final nim = _nimController.text.trim();
     final jurusan = _jurusanController.text.trim();
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
     if (fullName.isEmpty ||
         email.isEmpty ||
@@ -52,8 +55,8 @@ class _RegisterPageState extends State<RegisterPage> {
       _showMessage('NIM dan Jurusan wajib diisi untuk siswa.', isError: true);
       return;
     }
-    if (!email.contains('@')) {
-      _showMessage('Masukkan alamat email yang valid.', isError: true);
+    if (!emailRegex.hasMatch(email)) {
+      _showMessage('Masukkan alamat email yang valid (contoh: user@domain.com).', isError: true);
       return;
     }
     if (password.length < 6) {
@@ -111,6 +114,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = AppColors.bgCard(context);
+    final textPrimary = AppColors.textPrimary(context);
+    final textSecondary = AppColors.textSecondary(context);
+    final borderColor = AppColors.border(context);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -118,11 +127,18 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Create Account",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
               ),
-              const Text("Sign up to get started"),
+              Text(
+                "Sign up to get started",
+                style: TextStyle(color: textSecondary),
+              ),
               const SizedBox(height: 20),
               RoleSelector(
                 options: _roleOptions,
@@ -138,125 +154,160 @@ class _RegisterPageState extends State<RegisterPage> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: borderColor),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 2,
-                      offset: Offset(4, 4),
-                      spreadRadius: 2,
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Full Name"),
-                          SizedBox(height: 5),
-                          CustomTextField(
-                            controller: _fullnameController,
-                            hintText: "Jhoen Doe",
-                            icon: Icons.person,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Full Name",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      CustomTextField(
+                        controller: _fullnameController,
+                        hintText: "Jhoen Doe",
+                        icon: Icons.person,
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        "Email",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      CustomTextField(
+                        controller: _emailController,
+                        hintText: "email@domain.com",
+                        icon: Icons.email,
+                      ),
+                      if (_isStudentRole) ...[
+                        const SizedBox(height: 15),
+                        Text(
+                          "NIM",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: textPrimary,
                           ),
-                          SizedBox(height: 10),
-                          Text("Email"),
-                          SizedBox(height: 5),
-                          CustomTextField(
-                            controller: _emailController,
-                            hintText: "email@domain.com",
-                            icon: Icons.email,
+                        ),
+                        const SizedBox(height: 5),
+                        CustomTextField(
+                          controller: _nimController,
+                          hintText: "Nomor Induk Mahasiswa",
+                          icon: Icons.badge_outlined,
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          "Jurusan",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: textPrimary,
                           ),
-                          if (_isStudentRole) ...[
-                            SizedBox(height: 10),
-                            Text("NIM"),
-                            SizedBox(height: 5),
-                            CustomTextField(
-                              controller: _nimController,
-                              hintText: "Nomor Induk Mahasiswa",
-                              icon: Icons.badge_outlined,
+                        ),
+                        const SizedBox(height: 5),
+                        CustomTextField(
+                          controller: _jurusanController,
+                          hintText: "Teknik Informatika",
+                          icon: Icons.school_outlined,
+                        ),
+                      ],
+                      const SizedBox(height: 15),
+                      Text(
+                        "Password",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      CustomTextField(
+                        controller: _passwordController,
+                        hintText: "Password",
+                        icon: Icons.lock,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        "Confirm Password",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      CustomTextField(
+                        controller: _confirmController,
+                        hintText: "Confirm Password",
+                        icon: Icons.lock_reset,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 25),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            SizedBox(height: 10),
-                            Text("Jurusan"),
-                            SizedBox(height: 5),
-                            CustomTextField(
-                              controller: _jurusanController,
-                              hintText: "Teknik Informatika",
-                              icon: Icons.school_outlined,
-                            ),
-                          ],
-                          SizedBox(height: 10),
-                          Text("Password"),
-                          SizedBox(height: 5),
-                          CustomTextField(
-                            controller: _passwordController,
-                            hintText: "Password",
-                            icon: Icons.lock,
-                            isPassword: true,
+                            backgroundColor: const Color(0xFF2563EB),
                           ),
-                          SizedBox(height: 10),
-                          Text("Confirm Password"),
-                          SizedBox(height: 5),
-                          CustomTextField(
-                            controller: _confirmController,
-                            hintText: "Password",
-                            icon: Icons.lock_reset,
-                            isPassword: true,
-                          ),
-                          SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadiusGeometry.circular(
-                                    10,
+                          onPressed: _isSubmitting ? null : _prosesRegister,
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  "Sign Up",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                backgroundColor: Color(0xFF2563EB),
-                              ),
-                              onPressed: _isSubmitting ? null : _prosesRegister,
-                              child: _isSubmitting
-                                  ? const SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "Sign up",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
+              const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already Have Account?"),
+                  Text(
+                    "Already Have Account? ",
+                    style: TextStyle(color: textSecondary),
+                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text(
-                      "Sign ",
+                    child: const Text(
+                      "Sign In",
                       style: TextStyle(
                         color: Color(0xFF2563EB),
                         fontWeight: FontWeight.bold,

@@ -70,6 +70,15 @@ class _UploadMateriPageState extends State<UploadMateriPage> {
       return;
     }
 
+    final fileUrl = _fileUrlController.text.trim();
+    if (fileUrl.isNotEmpty) {
+      final uri = Uri.tryParse(fileUrl);
+      if (uri == null || !uri.hasScheme || (uri.scheme != 'http' && uri.scheme != 'https')) {
+        UiUtils.showToast(context, 'Tautan lampiran berkas harus berupa URL valid (http:// atau https://)', isError: true);
+        return;
+      }
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -111,23 +120,26 @@ class _UploadMateriPageState extends State<UploadMateriPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEditMode = widget.existingMateri != null;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
+          icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           isEditMode ? 'Edit Materi Perkuliahan' : 'Upload Materi Perkuliahan',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
+            color: textColor,
           ),
         ),
       ),
@@ -148,8 +160,12 @@ class _UploadMateriPageState extends State<UploadMateriPage> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x332563EB), blurRadius: 10, offset: Offset(0, 4)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0x332563EB),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: Row(
@@ -157,26 +173,26 @@ class _UploadMateriPageState extends State<UploadMateriPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.cloud_upload_rounded, color: Colors.white, size: 28),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Unggah Materi Baru',
-                            style: TextStyle(
+                            isEditMode ? 'Edit Materi Perkuliahan' : 'Unggah Materi Baru',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
                           ),
-                          SizedBox(height: 2),
-                          Text(
+                          const SizedBox(height: 2),
+                          const Text(
                             'Bagikan slide, modul PDF, atau link referensi kepada mahasiswa kelas Anda.',
                             style: TextStyle(color: Colors.white70, fontSize: 12),
                           ),
@@ -192,41 +208,47 @@ class _UploadMateriPageState extends State<UploadMateriPage> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0x08000000),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Pilih Mata Kuliah',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textColor),
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       isExpanded: true,
+                      dropdownColor: cardBg,
+                      style: TextStyle(color: textColor, fontSize: 14),
                       initialValue: _selectedCourseId.isNotEmpty ? _selectedCourseId : null,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                         prefixIcon: const Icon(Icons.class_rounded, color: Color(0xFF2563EB), size: 20),
                       ),
-                      hint: const Text('Pilih mata kuliah...'),
+                      hint: Text('Pilih mata kuliah...', style: TextStyle(color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8))),
                       items: widget.courses.map((course) {
                         final name = course['nama_mk'] as String? ?? 'Matkul';
                         final code = course['kode_mk'] as String? ?? '-';
                         return DropdownMenuItem<String>(
                           value: course['id'] as String,
-                          child: Text('$name ($code)', overflow: TextOverflow.ellipsis),
+                          child: Text('$name ($code)', style: TextStyle(color: textColor), overflow: TextOverflow.ellipsis),
                         );
                       }).toList(),
                       onChanged: (val) {

@@ -51,6 +51,15 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final fileUrl = _fileUrlController.text.trim();
+    if (fileUrl.isNotEmpty) {
+      final uri = Uri.tryParse(fileUrl);
+      if (uri == null || !uri.hasScheme || (uri.scheme != 'http' && uri.scheme != 'https')) {
+        UiUtils.showToast(context, 'Tautan lampiran berkas harus berupa URL valid (http:// atau https://)', isError: true);
+        return;
+      }
+    }
+
     setState(() => _isLoading = true);
     try {
       final tugasId = widget.tugas['id'] as String;
@@ -58,7 +67,7 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
         tugasId: tugasId,
         studentId: widget.studentId,
         jawaban: _jawabanController.text.trim(),
-        fileUrl: _fileUrlController.text.trim(),
+        fileUrl: fileUrl,
       );
 
       if (!mounted) return;
@@ -74,17 +83,18 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAlreadySubmitted = widget.existingSubmission != null;
     final nilai = widget.existingSubmission?['nilai'];
     final isGraded = isAlreadySubmitted && (widget.existingSubmission!['status'] == 'graded' || nilai != null);
     final catatanDosen = widget.existingSubmission?['catatan_dosen'] as String? ?? '';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Pengerjaan & Detail Tugas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        foregroundColor: isDark ? Colors.white : const Color(0xFF0F172A),
         elevation: 0.5,
       ),
       body: SafeArea(
@@ -107,9 +117,9 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECFDF5),
+                      color: isDark ? const Color(0xFF064E3B).withValues(alpha: 0.5) : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFA7F3D0)),
+                      border: Border.all(color: isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0)),
                     ),
                     child: Row(
                       children: [
@@ -126,27 +136,32 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'HASIL EVALUASI DOSEN',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF065F46), letterSpacing: 0.5),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF065F46),
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 'Nilai: $nilai / 100',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF047857),
+                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                                 ),
                               ),
                               if (catatanDosen.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(
                                   'Catatan Dosen: "$catatanDosen"',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     fontStyle: FontStyle.italic,
-                                    color: Color(0xFF065F46),
+                                    color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF065F46),
                                   ),
                                 ),
                               ],
@@ -160,14 +175,14 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
 
                 const SizedBox(height: 24),
 
-                const Text(
-                  'Form Pengumpulan Jawaban',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                Text(
+                  'Form Pengumpulkan Jawaban',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Tuliskan uraian jawaban dan sertakan tautan berkas tugas Anda di bawah ini.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B)),
                 ),
 
                 const SizedBox(height: 16),
@@ -217,7 +232,7 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
-                            isAlreadySubmitted ? 'Perbarui Pengumpulan Tugas' : 'Kirim Tugas Sekarang',
+                            isAlreadySubmitted ? 'Perbarui Pengumpulkan Tugas' : 'Kirim Tugas Sekarang',
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                   ),

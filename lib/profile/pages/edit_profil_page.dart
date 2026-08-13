@@ -53,7 +53,7 @@ class _EditProfilPageState extends State<EditProfilPage> {
     }
 
     setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
       setState(() => _isSaving = false);
@@ -72,12 +72,14 @@ class _EditProfilPageState extends State<EditProfilPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
+    final nameStr = _nameController.text.isNotEmpty ? _nameController.text : widget.fullName;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: cardBg,
-        elevation: 0,
+        elevation: 0.5,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
@@ -92,107 +94,183 @@ class _EditProfilPageState extends State<EditProfilPage> {
         ),
       ),
       body: SafeArea(
-        child: ListView(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB), size: 24),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Perbarui Informasi Akun',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Ubah data diri Anda yang terdaftar pada sistem',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Avatar Edit Header Banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF2563EB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _nameController,
-                    label: 'Nama Lengkap',
-                    prefixIcon: Icons.person_outline_rounded,
-                  ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _emailController,
-                    label: 'Email Terdaftar',
-                    prefixIcon: Icons.email_outlined,
-                  ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _deptController,
-                    label: 'Program Studi / Jurusan',
-                    prefixIcon: Icons.school_outlined,
-                  ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _phoneController,
-                    label: 'Nomor WhatsApp / Telepon',
-                    prefixIcon: Icons.phone_android_rounded,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: _isSaving ? null : _saveChanges,
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                            )
-                          : const Text(
-                              'Simpan Perubahan Profil',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.3) : const Color(0x262563EB),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          child: Text(
+                            nameStr.isNotEmpty ? nameStr[0].toUpperCase() : 'U',
+                            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF2563EB),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Ubah Foto & Informasi Diri',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Pastikan data terdaftar Anda akurat dan up to date.',
+                            style: TextStyle(fontSize: 12, color: Color(0xFF93C5FD)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              // Form Container Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0x08000000),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB), size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Form Perubahan Profil',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Perbarui nama, email, program studi, dan kontak Anda',
+                                style: TextStyle(fontSize: 12, color: subTextColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomFormField(
+                      controller: _nameController,
+                      label: 'Nama Lengkap',
+                      prefixIcon: Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomFormField(
+                      controller: _emailController,
+                      label: 'Email Terdaftar',
+                      prefixIcon: Icons.email_outlined,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomFormField(
+                      controller: _deptController,
+                      label: 'Program Studi / Departemen',
+                      prefixIcon: Icons.school_outlined,
+                    ),
+                    const SizedBox(height: 14),
+                    CustomFormField(
+                      controller: _phoneController,
+                      label: 'Nomor Telepon / WhatsApp',
+                      prefixIcon: Icons.phone_android_rounded,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: _isSaving ? null : _saveChanges,
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : const Icon(Icons.save_rounded, size: 20),
+                        label: Text(
+                          _isSaving ? 'Menyimpan...' : 'Simpan Perubahan Profil',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -49,16 +49,18 @@ class _StudentAcademicsViewState extends State<StudentAcademicsView>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         // Tab Header
         Container(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           child: TabBar(
             controller: _tabController,
-            labelColor: const Color(0xFF2563EB),
-            unselectedLabelColor: const Color(0xFF64748B),
-            indicatorColor: const Color(0xFF2563EB),
+            labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+            unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            indicatorColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
             indicatorWeight: 3,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             tabs: const [

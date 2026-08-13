@@ -136,6 +136,7 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
 
   Widget _buildTabChip(int index, String label, IconData icon) {
     final isSelected = _selectedTab == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () => setState(() => _selectedTab = index),
       borderRadius: BorderRadius.circular(20),
@@ -143,7 +144,9 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9),
+          color: isSelected
+              ? const Color(0xFF2563EB)
+              : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -151,7 +154,9 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+              color: isSelected
+                  ? Colors.white
+                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
             ),
             const SizedBox(width: 6),
             Text(
@@ -159,7 +164,9 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF475569),
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
               ),
             ),
           ],
@@ -241,18 +248,21 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
 
   // --- TAB 2: UPLOAD MATERI ---
   Widget _buildUploadMateriTab() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Materi Perkuliahan',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: textColor,
               ),
             ),
             ElevatedButton.icon(
@@ -294,18 +304,21 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
 
   // --- TAB 3: ASSIGN TUGAS ---
   Widget _buildAssignTugasTab() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Penugasan Siswa',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0F172A),
+                color: textColor,
               ),
             ),
             ElevatedButton.icon(

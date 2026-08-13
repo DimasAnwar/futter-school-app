@@ -11,29 +11,30 @@ class AuthServices {
     String? nim,
     String? jurusan,
   }) async {
+    final cleanEmail = email.trim();
     try {
       final dataMap = <String, dynamic>{
-        'full_name': fullName,
+        'full_name': fullName.trim(),
         'role': role,
       };
-      if (nim != null && nim.isNotEmpty) dataMap['nim'] = nim;
-      if (jurusan != null && jurusan.isNotEmpty) dataMap['jurusan'] = jurusan;
+      if (nim != null && nim.trim().isNotEmpty) dataMap['nim'] = nim.trim();
+      if (jurusan != null && jurusan.trim().isNotEmpty) dataMap['jurusan'] = jurusan.trim();
 
       final response = await _supabase.auth.signUp(
-        email: email,
+        email: cleanEmail,
         password: password,
         data: dataMap,
       );
 
       final user = response.user;
       if (user == null) {
-        throw 'Akun tidak berhasil dibuat. Coba lagi.';
+        throw 'Akun tidak berhasil dibuat. Coba beberapa saat lagi.';
       }
 
       // Auto-assign nim & jurusan to profiles table if user session is available
       final updatePayload = <String, dynamic>{};
-      if (nim != null && nim.isNotEmpty) updatePayload['nim'] = nim;
-      if (jurusan != null && jurusan.isNotEmpty) updatePayload['jurusan'] = jurusan;
+      if (nim != null && nim.trim().isNotEmpty) updatePayload['nim'] = nim.trim();
+      if (jurusan != null && jurusan.trim().isNotEmpty) updatePayload['jurusan'] = jurusan.trim();
       if (updatePayload.isNotEmpty) {
         try {
           await _supabase.from('profiles').update(updatePayload).eq('id', user.id);
@@ -46,7 +47,7 @@ class AuthServices {
     } on AuthException catch (e) {
       throw e.message;
     } catch (e) {
-      throw 'Gagal mendaftar: $e';
+      throw 'Gagal mendaftar: Terjadi kesalahan sistem. Silakan coba lagi.';
     }
   }
 
@@ -55,9 +56,10 @@ class AuthServices {
     required String password,
     required String expectedRole,
   }) async {
+    final cleanEmail = email.trim();
     try {
       final response = await _supabase.auth.signInWithPassword(
-        email: email,
+        email: cleanEmail,
         password: password,
       );
       final userId = response.user?.id;
@@ -73,7 +75,7 @@ class AuthServices {
 
       if (dataProfile == null || dataProfile['role'] == null) {
         await _supabase.auth.signOut();
-        throw StateError('Profil akun tidak ditemukan. Hubungi admin.');
+        throw StateError('Profil akun tidak ditemukan. Hubungi administrator.');
       }
 
       final actualRole = dataProfile['role'] as String;
@@ -88,7 +90,7 @@ class AuthServices {
     } on AuthException catch (e) {
       throw e.message;
     } catch (e) {
-      throw e is StateError ? e.message : 'Login gagal: $e';
+      throw e is StateError ? e.message : 'Login gagal. Periksa kembali email dan kata sandi Anda.';
     }
   }
 

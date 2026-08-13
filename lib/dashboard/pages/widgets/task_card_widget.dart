@@ -231,16 +231,16 @@ class TaskCardWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: isDark ? const Color(0xFF064E3B).withValues(alpha: 0.5) : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFA7F3D0)),
+                  border: Border.all(color: isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF059669),
+                        color: isDark ? const Color(0xFF047857) : const Color(0xFF059669),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
@@ -258,14 +258,14 @@ class TaskCardWidget extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Hasil Evaluasi Dosen',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF065F46)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF065F46)),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             catatanDosen.isNotEmpty ? catatanDosen : 'Tidak ada catatan tambahan dari dosen.',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF047857), height: 1.3),
+                            style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF047857), height: 1.3),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -280,7 +280,7 @@ class TaskCardWidget extends StatelessWidget {
             // Teacher Action Footer (Beri Nilai & Student Count)
             if (role == 'teacher' && onGrade != null) ...[
               const SizedBox(height: 14),
-              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

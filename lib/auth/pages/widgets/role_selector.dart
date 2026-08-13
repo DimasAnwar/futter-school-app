@@ -23,12 +23,14 @@ class RoleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       height: height,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF1FF),
+        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFEAF1FF),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -44,12 +46,16 @@ class RoleSelector extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.transparent,
+                  color: isSelected
+                      ? (isDark ? const Color(0xFF2563EB) : Colors.white)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -61,7 +67,9 @@ class RoleSelector extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: options.length > 3 ? 12 : 13,
-                    color: isSelected ? Colors.black : Colors.black54,
+                    color: isSelected
+                        ? (isDark ? Colors.white : const Color(0xFF2563EB))
+                        : (isDark ? const Color(0xFF94A3B8) : Colors.black54),
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
