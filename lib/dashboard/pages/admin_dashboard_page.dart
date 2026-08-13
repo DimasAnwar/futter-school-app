@@ -1,5 +1,6 @@
 import 'package:bestpractice/chat/pages/obrolan_page.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
+import 'package:bestpractice/common/widgets/dashboard_skeleton.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_academics_view.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_buat_pengumuman_view.dart';
 import 'package:bestpractice/dashboard/pages/admin/admin_home_view.dart';
@@ -153,7 +154,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           future: _dashboardData,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
+              return const DashboardSkeleton();
             }
             if (snapshot.hasError) {
               return Center(
@@ -198,7 +199,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           future: _dashboardData,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
+              return const DashboardSkeleton();
             }
             final data =
                 snapshot.data ??
@@ -242,7 +243,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           future: _dashboardData,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
+              return const DashboardSkeleton();
             }
             final data =
                 snapshot.data ??

@@ -1,5 +1,6 @@
 import 'package:bestpractice/chat/pages/obrolan_page.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
+import 'package:bestpractice/common/widgets/dashboard_skeleton.dart';
 import 'package:bestpractice/dashboard/pages/student/student_academics_view.dart';
 import 'package:bestpractice/dashboard/pages/student/student_home_view.dart';
 import 'package:bestpractice/dashboard/pages/widgets/student/student_bottom_nav.dart';
@@ -83,7 +84,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           future: _dashboardData,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
+              return const DashboardSkeleton();
             }
             if (snapshot.hasError) {
               return Center(
@@ -136,7 +137,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           future: _dashboardData,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
+              return const DashboardSkeleton();
             }
 
             final data = snapshot.data ??

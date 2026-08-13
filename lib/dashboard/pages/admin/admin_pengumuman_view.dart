@@ -1,3 +1,4 @@
+import 'package:bestpractice/common/widgets/skeleton_item.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/admin_header.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/card_container.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/custom_buttons.dart';
@@ -64,9 +65,12 @@ class _AdminPengumumanViewState extends State<AdminPengumumanView> {
           stream: _announcementsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: Center(child: CircularProgressIndicator()),
+              return Column(
+                children: const [
+                  SkeletonItem(width: double.infinity, height: 100, borderRadius: 16),
+                  SizedBox(height: 12),
+                  SkeletonItem(width: double.infinity, height: 100, borderRadius: 16),
+                ],
               );
             }
 

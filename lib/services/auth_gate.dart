@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/pages/login_page.dart';
+import '../common/widgets/dashboard_skeleton.dart';
 import '../dashboard/pages/parent_dashboard_page.dart';
 import '../dashboard/pages/admin_dashboard_page.dart';
 import '../dashboard/pages/student_dashboard_page.dart';
@@ -18,7 +19,7 @@ class AuthGate extends StatelessWidget {
         
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()), // Tunjukin loading muter
+            body: SafeArea(child: DashboardSkeleton()),
           );
         }
 
@@ -32,7 +33,9 @@ class AuthGate extends StatelessWidget {
           future: AuthServices().getProfile(session.user.id),
           builder: (context, profileSnapshot) {
             if (profileSnapshot.connectionState != ConnectionState.done) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(
+                body: SafeArea(child: DashboardSkeleton()),
+              );
             }
             final profile = profileSnapshot.data;
             if (profile == null) {

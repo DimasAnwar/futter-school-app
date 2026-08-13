@@ -1,6 +1,6 @@
 import 'package:bestpractice/common/theme/theme_controller.dart';
 import 'package:bestpractice/common/utils/ui_utils.dart';
-import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
+import 'package:bestpractice/profile/pages/edit_profil_page.dart';
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -22,37 +22,41 @@ class ProfilPage extends StatefulWidget {
 
 class _ProfilPageState extends State<ProfilPage> {
   final AuthServices _authServices = AuthServices();
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  final TextEditingController _deptController = TextEditingController(text: 'Teknik Informatika & Komputer');
-  final TextEditingController _phoneController = TextEditingController(text: '+62 812-3456-7890');
+  late String _currentName;
+  late String _currentEmail;
+  String _currentDept = 'Teknik Informatika & Komputer';
+  String _currentPhone = '+62 812-3456-7890';
 
   bool _isNotificationEnabled = true;
   bool _isDarkModeEnabled = false;
-  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.fullName);
-    _emailController = TextEditingController(text: widget.userEmail);
+    _currentName = widget.fullName;
+    _currentEmail = widget.userEmail;
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _deptController.dispose();
-    _phoneController.dispose();
-    super.dispose();
-  }
+  Future<void> _openEditProfilPage() async {
+    final result = await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfilPage(
+          fullName: _currentName,
+          email: _currentEmail,
+          dept: _currentDept,
+          phone: _currentPhone,
+        ),
+      ),
+    );
 
-  Future<void> _saveProfileChanges() async {
-    setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (mounted) {
-      setState(() => _isSaving = false);
-      UiUtils.showToast(context, 'Profil berhasil diperbarui!');
+    if (result != null && mounted) {
+      setState(() {
+        _currentName = result['fullName'] ?? _currentName;
+        _currentEmail = result['email'] ?? _currentEmail;
+        _currentDept = result['dept'] ?? _currentDept;
+        _currentPhone = result['phone'] ?? _currentPhone;
+      });
     }
   }
 
@@ -75,22 +79,34 @@ class _ProfilPageState extends State<ProfilPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CustomFormField(
+            TextField(
               controller: oldPasswordCtrl,
-              label: 'Kata Sandi Saat Ini',
               obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Saat Ini',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
             ),
             const SizedBox(height: 10),
-            CustomFormField(
+            TextField(
               controller: newPasswordCtrl,
-              label: 'Kata Sandi Baru',
               obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Baru',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
             ),
             const SizedBox(height: 10),
-            CustomFormField(
+            TextField(
               controller: confirmPasswordCtrl,
-              label: 'Konfirmasi Kata Sandi Baru',
               obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Konfirmasi Kata Sandi Baru',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
             ),
           ],
         ),
@@ -145,8 +161,9 @@ class _ProfilPageState extends State<ProfilPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
     final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
-    final nameStr = _nameController.text.isNotEmpty ? _nameController.text : widget.fullName;
+    final nameStr = _currentName.isNotEmpty ? _currentName : widget.fullName;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
@@ -210,7 +227,7 @@ class _ProfilPageState extends State<ProfilPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          widget.userEmail,
+                          _currentEmail,
                           style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.85)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -236,7 +253,7 @@ class _ProfilPageState extends State<ProfilPage> {
 
             const SizedBox(height: 24),
 
-            // Account Info Card
+            // Account Info Card (Display Only with Edit Button)
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
@@ -249,54 +266,71 @@ class _ProfilPageState extends State<ProfilPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Informasi Akun & Data Diri',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Informasi Akun & Data Diri',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
+                      ),
+                      TextButton.icon(
+                        onPressed: _openEditProfilPage,
+                        icon: const Icon(Icons.edit_rounded, size: 16, color: Color(0xFF2563EB)),
+                        label: const Text(
+                          'Edit',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  CustomFormField(
-                    controller: _nameController,
+                  const SizedBox(height: 12),
+                  _buildProfileInfoItem(
+                    icon: Icons.person_outline_rounded,
                     label: 'Nama Lengkap',
-                    prefixIcon: Icons.person_outline_rounded,
+                    value: _currentName,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
                   ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _emailController,
+                  Divider(height: 20, color: dividerColor),
+                  _buildProfileInfoItem(
+                    icon: Icons.email_outlined,
                     label: 'Email Terdaftar',
-                    prefixIcon: Icons.email_outlined,
+                    value: _currentEmail,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
                   ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _deptController,
+                  Divider(height: 20, color: dividerColor),
+                  _buildProfileInfoItem(
+                    icon: Icons.school_outlined,
                     label: 'Program Studi / Jurusan',
-                    prefixIcon: Icons.school_outlined,
+                    value: _currentDept,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
                   ),
-                  const SizedBox(height: 14),
-                  CustomFormField(
-                    controller: _phoneController,
+                  Divider(height: 20, color: dividerColor),
+                  _buildProfileInfoItem(
+                    icon: Icons.phone_android_rounded,
                     label: 'Nomor WhatsApp / Telepon',
-                    prefixIcon: Icons.phone_android_rounded,
+                    value: _currentPhone,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
                   ),
                   const SizedBox(height: 18),
                   SizedBox(
                     width: double.infinity,
-                    height: 46,
-                    child: ElevatedButton(
+                    height: 44,
+                    child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2563EB),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
                       ),
-                      onPressed: _isSaving ? null : _saveProfileChanges,
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Text(
-                              'Simpan Perubahan Profil',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
+                      onPressed: _openEditProfilPage,
+                      icon: const Icon(Icons.edit_rounded, color: Colors.white, size: 18),
+                      label: const Text(
+                        'Edit Profil Pengguna',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
                     ),
                   ),
                 ],
@@ -366,6 +400,46 @@ class _ProfilPageState extends State<ProfilPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileInfoItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color textColor,
+    required Color subTextColor,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: const Color(0xFF2563EB), size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 11, color: subTextColor, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

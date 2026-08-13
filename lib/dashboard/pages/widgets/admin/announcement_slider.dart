@@ -1,3 +1,4 @@
+import 'package:bestpractice/common/widgets/skeleton_item.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/card_container.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/empty_state.dart';
 import 'package:bestpractice/services/admin_services.dart';
@@ -71,9 +72,10 @@ class _AnnouncementSliderState extends State<AnnouncementSlider> {
           stream: _announcementsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                height: 150,
-                child: Center(child: CircularProgressIndicator()),
+              return const SkeletonItem(
+                width: double.infinity,
+                height: 140,
+                borderRadius: 16,
               );
             }
 
