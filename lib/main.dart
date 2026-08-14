@@ -5,6 +5,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import './auth/pages/login_page.dart';
 import 'auth/pages/register_page.dart';
+import 'auth/pages/forgot_password_page.dart';
+import 'auth/pages/reset_password_page.dart';
+import 'profile/pages/change_password_page.dart';
+import 'package:bestpractice/services/notification_service.dart';
 import './services/auth_gate.dart';
 import './common/pages/splash_screen.dart';
 
@@ -16,6 +20,7 @@ void main() async {
     publishableKey: dotenv.env['PUBLISHABLE_KEY']!,
   );
   await ThemeController.instance.init();
+  await NotificationService().init();
   runApp(const MyApp());
 }
 
@@ -38,6 +43,9 @@ class MyApp extends StatelessWidget {
             '/splash': (context) => const SplashScreen(),
             '/login': (context) => const LoginPage(),
             '/register': (context) => const RegisterPage(),
+            '/forgot-password': (context) => const ForgotPasswordPage(),
+            '/reset-password': (context) => const ResetPasswordPage(),
+            '/change-password': (context) => const ChangePasswordPage(),
             '/dashboard': (context) => const AuthGate(),
           },
         );

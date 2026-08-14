@@ -60,6 +60,7 @@ class CustomFormField extends StatelessWidget {
     this.onChanged,
     this.keyboardType,
     this.obscureText = false,
+    this.enabled = true,
   });
 
   final String label;
@@ -73,6 +74,7 @@ class CustomFormField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +97,7 @@ class CustomFormField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
+          enabled: enabled,
           controller: controller,
           obscureText: obscureText,
           validator: validator,

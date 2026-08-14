@@ -33,6 +33,54 @@ class TaskCardWidget extends StatelessWidget {
   final int? totalStudentsCount;
   final bool showEvaluationDetails;
 
+  String _formatDeadline(String raw) {
+    final str = raw.trim();
+    if (str.isEmpty || str == 'Tidak ada deadline') {
+      return 'Tidak ada batas waktu';
+    }
+
+    final dt = DateTime.tryParse(str);
+    if (dt == null) {
+      return str;
+    }
+
+    final local = dt.toLocal();
+    final dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    final monthNames = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    final dayName = dayNames[local.weekday - 1];
+    final day = local.day.toString().padLeft(2, '0');
+    final month = monthNames[local.month - 1];
+    final year = local.year;
+    final hour = local.hour.toString().padLeft(2, '0');
+    final minute = local.minute.toString().padLeft(2, '0');
+
+    return '$dayName, $day $month $year • $hour:$minute WIB';
+  }
+
+  String? _getRemainingBadge(String raw) {
+    final dt = DateTime.tryParse(raw.trim());
+    if (dt == null) return null;
+
+    final now = DateTime.now();
+    final diff = dt.difference(now);
+
+    if (diff.isNegative) {
+      return 'Tenggat Lewat';
+    } else if (diff.inDays > 0) {
+      return '${diff.inDays} Hari Lagi';
+    } else if (diff.inHours > 0) {
+      return '${diff.inHours} Jam Lagi';
+    } else if (diff.inMinutes > 0) {
+      return '${diff.inMinutes} Mnt Lagi';
+    } else {
+      return 'Segera Berakhir';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -57,6 +105,8 @@ class TaskCardWidget extends StatelessWidget {
     final isGraded = submission != null && (submission!['status'] == 'graded' || nilai != null);
     final isSubmitted = submission != null;
     final catatanDosen = submission?['catatan_dosen'] as String? ?? '';
+
+    final remainingBadgeStr = _getRemainingBadge(deadline);
 
     return InkWell(
       onTap: onTapCard,
@@ -179,28 +229,61 @@ class TaskCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Professional Deadline Container
+            // Professional Deadline Container with Easy-to-Read Date Format & Badge
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: deadlineBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: deadlineBorder),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: deadlineBorder, width: 1),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.event_available_rounded, size: 16, color: deadlineText),
+                  Icon(Icons.schedule_rounded, size: 16, color: deadlineText),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      'Deadline: $deadline',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: deadlineText,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DEADLINE PENGERJAAN',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: deadlineText.withValues(alpha: 0.8),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          _formatDeadline(deadline),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: deadlineText,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  if (remainingBadgeStr != null) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: deadlineText.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        remainingBadgeStr,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: deadlineText,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (role == 'teacher') ...[
                     if (onEdit != null)
                       IconButton(

@@ -30,7 +30,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   static const List<RoleOption> _roleOptions = [
     RoleOption(label: 'Students', roleKey: 'Students'),
-    RoleOption(label: 'Parents', roleKey: 'Parents'),
     RoleOption(label: 'Teacher', roleKey: 'Teachers'),
   ];
 

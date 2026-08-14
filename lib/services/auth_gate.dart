@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../auth/pages/login_page.dart';
 import '../common/widgets/dashboard_skeleton.dart';
-import '../dashboard/pages/parent_dashboard_page.dart';
 import '../dashboard/pages/admin_dashboard_page.dart';
 import '../dashboard/pages/student_dashboard_page.dart';
 import '../dashboard/pages/teacher_dashboard_page.dart';
@@ -55,9 +54,6 @@ class AuthGate extends StatelessWidget {
             }
             if (role == 'teacher' || role == 'teachers') {
               return TeacherDashboardPage(fullName: fullName);
-            }
-            if (role == 'parent' || role == 'parents') {
-              return ParentDashboardPage(fullName: fullName);
             }
             return Scaffold(body: Center(child: Text('Role "$role" tidak dikenali.')));
           },

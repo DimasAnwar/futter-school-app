@@ -232,39 +232,43 @@ class _TeacherCourseDetailPageState extends State<TeacherCourseDetailPage> with 
 
                     // Tab Bar
                     Container(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      child: TabBar(
-                        controller: _tabController,
-                        labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-                        unselectedLabelColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
-                        indicatorColor: const Color(0xFF2563EB),
-                        indicatorWeight: 3,
-                        tabs: [
-                          Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.menu_book_rounded, size: 18),
-                                const SizedBox(width: 6),
-                                Text('Materi (${_materiList.length})'),
-                              ],
-                            ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                      child: Container(
+                        height: 48,
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0).withValues(alpha: 0.7),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: TabBar(
+                          controller: _tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicatorPadding: EdgeInsets.zero,
+                          labelPadding: EdgeInsets.zero,
+                          indicator: BoxDecoration(
+                            color: isDark ? const Color(0xFF2563EB) : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.assignment_rounded, size: 18),
-                                const SizedBox(width: 6),
-                                Text('Tugas (${_tugasList.length})'),
-                              ],
-                            ),
-                          ),
-                        ],
+                          dividerColor: Colors.transparent,
+                          labelColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                          unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          tabs: [
+                            Tab(text: 'Materi (${_materiList.length})'),
+                            Tab(text: 'Tugas (${_tugasList.length})'),
+                          ],
+                        ),
                       ),
                     ),
-
-                    Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
 
                     // Tab Bar View Content
                     Expanded(

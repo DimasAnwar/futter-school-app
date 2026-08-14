@@ -22,7 +22,6 @@ class _LoginPageState extends State<LoginPage> {
 
   static const List<RoleOption> _roleOptions = [
     RoleOption(label: 'Student', roleKey: 'Students'),
-    RoleOption(label: 'Parent', roleKey: 'Parents'),
     RoleOption(label: 'Teacher', roleKey: 'Teachers'),
     RoleOption(label: 'Admin', roleKey: 'Admin'),
   ];
@@ -46,6 +45,11 @@ class _LoginPageState extends State<LoginPage> {
 
       if (mounted) {
         _showMessage('Login berhasil sebagai $role.');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/dashboard',
+          (route) => false,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -184,7 +188,9 @@ class _LoginPageState extends State<LoginPage> {
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/forgot-password');
+                                    },
                                     child: const Text(
                                       "Forget Password?",
                                       style: TextStyle(

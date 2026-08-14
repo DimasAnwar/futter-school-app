@@ -1,6 +1,7 @@
 import 'package:bestpractice/common/utils/ui_utils.dart';
 import 'package:bestpractice/dashboard/pages/widgets/admin/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilPage extends StatefulWidget {
   const EditProfilPage({
@@ -47,23 +48,65 @@ class _EditProfilPageState extends State<EditProfilPage> {
   }
 
   Future<void> _saveChanges() async {
-    if (_nameController.text.trim().isEmpty) {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
       UiUtils.showToast(context, 'Nama lengkap tidak boleh kosong', isError: true);
       return;
     }
 
     setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
       setState(() => _isSaving = false);
-      UiUtils.showToast(context, 'Profil berhasil diperbarui!');
-      Navigator.pop(context, {
-        'fullName': _nameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'dept': _deptController.text.trim(),
-        'phone': _phoneController.text.trim(),
-      });
+      UiUtils.showToast(context, 'Sesi pengguna tidak ditemukan', isError: true);
+      return;
+    }
+
+    final phoneVal = _phoneController.text.trim();
+    final deptVal = _deptController.text.trim();
+
+    try {
+      final updatePayload = <String, dynamic>{
+        'full_name': name,
+        'jurusan': deptVal,
+        'nohp': phoneVal,
+      };
+
+      // Try update first (satisfies standard UPDATE RLS policy)
+      final res = await Supabase.instance.client
+          .from('profiles')
+          .update(updatePayload)
+          .eq('id', user.id)
+          .select();
+
+      // If profile row doesn't exist yet, perform upsert with ID
+      if (res.isEmpty) {
+        final insertPayload = <String, dynamic>{
+          'id': user.id,
+          'full_name': name,
+          'jurusan': deptVal,
+          'nohp': phoneVal,
+        };
+        await Supabase.instance.client
+            .from('profiles')
+            .upsert(insertPayload);
+      }
+
+      if (mounted) {
+        setState(() => _isSaving = false);
+        UiUtils.showToast(context, 'Profil berhasil disimpan!');
+        Navigator.pop(context, {
+          'fullName': name,
+          'email': _emailController.text.trim(),
+          'dept': deptVal,
+          'phone': phoneVal,
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        UiUtils.showToast(context, 'Gagal menyimpan ke Supabase: $e', isError: true);
+      }
     }
   }
 

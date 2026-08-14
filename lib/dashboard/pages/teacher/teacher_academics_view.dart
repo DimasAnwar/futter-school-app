@@ -102,19 +102,27 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
                 ],
               ),
               const SizedBox(height: 12),
-              // Segmented Tabs
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildTabChip(0, 'Kelola Kelas', Icons.class_rounded),
-                    const SizedBox(width: 8),
-                    _buildTabChip(1, 'Upload Materi', Icons.upload_file_rounded),
-                    const SizedBox(width: 8),
-                    _buildTabChip(2, 'Assign Tugas', Icons.add_task_rounded),
-                    const SizedBox(width: 8),
-                    _buildTabChip(3, 'Beri Nilai', Icons.fact_check_rounded),
-                  ],
+              // Segmented Tabs Container Track
+              Container(
+                height: 48,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0).withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildTabChip(0, 'Kelola Kelas', Icons.class_rounded),
+                      const SizedBox(width: 4),
+                      _buildTabChip(1, 'Upload Materi', Icons.upload_file_rounded),
+                      const SizedBox(width: 4),
+                      _buildTabChip(2, 'Assign Tugas', Icons.add_task_rounded),
+                      const SizedBox(width: 4),
+                      _buildTabChip(3, 'Beri Nilai', Icons.fact_check_rounded),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -139,15 +147,24 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () => setState(() => _selectedTab = index),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF2563EB)
-              : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
-          borderRadius: BorderRadius.circular(20),
+              ? (isDark ? const Color(0xFF2563EB) : Colors.white)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
@@ -155,7 +172,7 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
               icon,
               size: 16,
               color: isSelected
-                  ? Colors.white
+                  ? (isDark ? Colors.white : const Color(0xFF2563EB))
                   : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
             ),
             const SizedBox(width: 6),
@@ -163,10 +180,10 @@ class _TeacherAcademicsViewState extends State<TeacherAcademicsView> {
               label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                 color: isSelected
-                    ? Colors.white
-                    : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
+                    ? (isDark ? Colors.white : const Color(0xFF2563EB))
+                    : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
               ),
             ),
           ],

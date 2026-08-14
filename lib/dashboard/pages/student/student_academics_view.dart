@@ -55,18 +55,66 @@ class _StudentAcademicsViewState extends State<StudentAcademicsView>
       children: [
         // Tab Header
         Container(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          child: TabBar(
-            controller: _tabController,
-            labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-            unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-            indicatorColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-            indicatorWeight: 3,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            tabs: const [
-              Tab(text: 'Mata Kuliah'),
-              Tab(text: 'Materi'),
-              Tab(text: 'Tugas Kuliah'),
+          width: double.infinity,
+          color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Akademik & Perkuliahan',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: widget.onRefresh,
+                    icon: const Icon(Icons.refresh_rounded, color: Color(0xFF2563EB)),
+                    tooltip: 'Refresh Data',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                height: 48,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0).withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorPadding: EdgeInsets.zero,
+                  labelPadding: EdgeInsets.zero,
+                  indicator: BoxDecoration(
+                    color: isDark ? const Color(0xFF2563EB) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  dividerColor: Colors.transparent,
+                  labelColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                  unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  tabs: const [
+                    Tab(text: 'Mata Kuliah'),
+                    Tab(text: 'Materi'),
+                    Tab(text: 'Tugas Kuliah'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

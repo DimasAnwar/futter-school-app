@@ -100,34 +100,38 @@ class TeacherHomeView extends StatelessWidget {
           // Welcome Banner
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: const Color(0xFF2563EB),
-              borderRadius: BorderRadius.circular(18),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x332563EB),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Row(
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Kelola kelas & pembelajaran',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        'Pantau materi, assign tugas, dan berikan nilai siswa.',
-                        style: TextStyle(color: Color(0xFFDCE8FF)),
-                      ),
-                    ],
+                Text(
+                  'Kelola kelas & pembelajaran',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Icon(Icons.cast_for_education_rounded, color: Colors.white, size: 48),
+                SizedBox(height: 6),
+                Text(
+                  'Pantau materi, assign tugas, dan berikan nilai siswa.',
+                  style: TextStyle(color: Color(0xFFE2E8F0), fontSize: 13, height: 1.4),
+                ),
               ],
             ),
           ),
@@ -135,19 +139,13 @@ class TeacherHomeView extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Pengumuman Kampus Section
-          Row(
-            children: [
-              const Icon(Icons.campaign_rounded, color: Color(0xFFF59E0B), size: 22),
-              const SizedBox(width: 8),
-              Text(
-                'Pengumuman Kampus',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-            ],
+          Text(
+            'Pengumuman Kampus',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
           ),
           const SizedBox(height: 12),
           AnnouncementSliderWidget(

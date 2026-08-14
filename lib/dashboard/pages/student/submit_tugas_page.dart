@@ -48,7 +48,26 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
     super.dispose();
   }
 
+  bool get _isDeadlinePassed {
+    final deadlineStr = widget.tugas['deadline'] as String?;
+    if (deadlineStr == null || deadlineStr.trim().isEmpty || deadlineStr == 'Tidak ada deadline') {
+      return false;
+    }
+    final dt = DateTime.tryParse(deadlineStr.trim());
+    if (dt == null) return false;
+    return dt.isBefore(DateTime.now());
+  }
+
   Future<void> _handleSubmit() async {
+    if (_isDeadlinePassed) {
+      UiUtils.showToast(
+        context,
+        'Tenggat waktu pengumpulan tugas ini telah berakhir. Anda tidak dapat mengedit atau mengirimkan jawaban.',
+        isError: true,
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     final fileUrl = _fileUrlController.text.trim();
@@ -88,6 +107,7 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
     final nilai = widget.existingSubmission?['nilai'];
     final isGraded = isAlreadySubmitted && (widget.existingSubmission!['status'] == 'graded' || nilai != null);
     final catatanDosen = widget.existingSubmission?['catatan_dosen'] as String? ?? '';
+    final isExpired = _isDeadlinePassed;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
@@ -111,6 +131,36 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                   submission: widget.existingSubmission,
                   role: 'student',
                 ),
+
+                if (isExpired) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: isDark ? const Color(0xFF78350F) : const Color(0xFFFDE68A)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.timer_off_rounded, color: Color(0xFFD97706), size: 24),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Tenggat waktu pengumpulan tugas telah berakhir. Anda tidak dapat lagi mengedit atau mengirimkan jawaban tugas ini.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFB45309),
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 if (isGraded) ...[
                   const SizedBox(height: 16),
@@ -181,7 +231,9 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Tuliskan uraian jawaban dan sertakan tautan berkas tugas Anda di bawah ini.',
+                  isExpired
+                      ? 'Pengumpulan tugas ini sudah ditutup karena melewati batas tenggat waktu.'
+                      : 'Tuliskan uraian jawaban dan sertakan tautan berkas tugas Anda di bawah ini.',
                   style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B)),
                 ),
 
@@ -190,8 +242,11 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                 // Jawaban Multiline Field
                 CustomFormField(
                   label: 'Jawaban / Uraian Tugas',
-                  hintText: 'Ketik uraian atau catatan jawaban tugas Anda di sini...',
+                  hintText: isExpired
+                      ? 'Pengumpulan telah ditutup.'
+                      : 'Ketik uraian atau catatan jawaban tugas Anda di sini...',
                   controller: _jawabanController,
+                  enabled: !isExpired,
                   maxLines: 6,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
@@ -206,8 +261,9 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                 // File Link / Drive URL Field
                 CustomFormField(
                   label: 'Tautan Lampiran Berkas (Google Drive / GitHub / PDF)',
-                  hintText: 'https://drive.google.com/file/...',
+                  hintText: isExpired ? 'Pengumpulan telah ditutup.' : 'https://drive.google.com/file/...',
                   controller: _fileUrlController,
+                  enabled: !isExpired,
                   prefixIcon: Icons.link_rounded,
                 ),
 
@@ -218,9 +274,9 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleSubmit,
+                    onPressed: (_isLoading || isExpired) ? null : _handleSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
+                      backgroundColor: isExpired ? const Color(0xFF94A3B8) : const Color(0xFF2563EB),
                       foregroundColor: Colors.white,
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -232,7 +288,9 @@ class _SubmitTugasPageState extends State<SubmitTugasPage> {
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
-                            isAlreadySubmitted ? 'Perbarui Pengumpulkan Tugas' : 'Kirim Tugas Sekarang',
+                            isExpired
+                                ? 'Tenggat Waktu Telah Berakhir'
+                                : (isAlreadySubmitted ? 'Perbarui Pengumpulkan Tugas' : 'Kirim Tugas Sekarang'),
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                   ),

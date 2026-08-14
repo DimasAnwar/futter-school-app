@@ -4,6 +4,7 @@ import 'package:bestpractice/profile/pages/edit_profil_page.dart';
 import 'package:bestpractice/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilPage extends StatefulWidget {
@@ -26,10 +27,12 @@ class _ProfilPageState extends State<ProfilPage> {
   final AuthServices _authServices = AuthServices();
   late String _currentName;
   late String _currentEmail;
-  String _currentDept = 'Teknik Informatika & Komputer';
-  String _currentPhone = '+62 812-3456-7890';
-  final String _currentIdNumber = '2026081399';
+  String _currentDept = '-';
+  String _currentPhone = '-';
+  String _currentIdNumber = '-';
 
+  String? _avatarUrl;
+  bool _isUploadingAvatar = false;
   bool _isNotificationEnabled = true;
 
   @override
@@ -37,6 +40,136 @@ class _ProfilPageState extends State<ProfilPage> {
     super.initState();
     _currentName = widget.fullName;
     _currentEmail = widget.userEmail;
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        if (user.email != null && user.email!.isNotEmpty) {
+          _currentEmail = user.email!;
+        }
+        final profile = await _authServices.getProfile(user.id);
+        if (profile != null && mounted) {
+          setState(() {
+            _avatarUrl = profile['avatar_url'] as String?;
+            if (profile['full_name'] != null && (profile['full_name'] as String).trim().isNotEmpty) {
+              _currentName = (profile['full_name'] as String).trim();
+            }
+            if (profile['nim'] != null && (profile['nim'] as String).trim().isNotEmpty) {
+              _currentIdNumber = (profile['nim'] as String).trim();
+            } else if (profile['nip'] != null && (profile['nip'] as String).trim().isNotEmpty) {
+              _currentIdNumber = (profile['nip'] as String).trim();
+            }
+            if (profile['jurusan'] != null && (profile['jurusan'] as String).trim().isNotEmpty) {
+              _currentDept = (profile['jurusan'] as String).trim();
+            } else if (profile['dept'] != null && (profile['dept'] as String).trim().isNotEmpty) {
+              _currentDept = (profile['dept'] as String).trim();
+            }
+            if (profile['nohp'] != null && (profile['nohp'] as String).trim().isNotEmpty) {
+              _currentPhone = (profile['nohp'] as String).trim();
+            } else if (profile['phone'] != null && (profile['phone'] as String).trim().isNotEmpty) {
+              _currentPhone = (profile['phone'] as String).trim();
+            } else if (user.phone != null && user.phone!.trim().isNotEmpty) {
+              _currentPhone = user.phone!.trim();
+            }
+          });
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _pickAndUploadAvatar(ImageSource source) async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      UiUtils.showToast(context, 'Sesi user tidak ditemukan.', isError: true);
+      return;
+    }
+
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+
+      if (pickedFile == null) return;
+
+      setState(() => _isUploadingAvatar = true);
+      final bytes = await pickedFile.readAsBytes();
+
+      final newAvatarUrl = await _authServices.uploadAvatar(
+        userId: user.id,
+        bytes: bytes,
+        fileName: pickedFile.name,
+      );
+
+      if (mounted) {
+        setState(() {
+          _avatarUrl = newAvatarUrl;
+        });
+        UiUtils.showToast(context, 'Foto profil berhasil diperbarui!');
+      }
+    } catch (e) {
+      if (mounted) {
+        UiUtils.showToast(context, 'Gagal mengunggah foto profil: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingAvatar = false);
+      }
+    }
+  }
+
+  void _showAvatarOptions() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final txt = isDark ? Colors.white : const Color(0xFF0F172A);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: bg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ganti Foto Profil',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: txt),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_rounded, color: Color(0xFF2563EB)),
+                  title: Text('Pilih dari Galeri', style: TextStyle(color: txt)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickAndUploadAvatar(ImageSource.gallery);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_rounded, color: Color(0xFF2563EB)),
+                  title: Text('Ambil Foto via Kamera', style: TextStyle(color: txt)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickAndUploadAvatar(ImageSource.camera);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _openEditProfilPage() async {
@@ -59,159 +192,11 @@ class _ProfilPageState extends State<ProfilPage> {
         _currentDept = result['dept'] ?? _currentDept;
         _currentPhone = result['phone'] ?? _currentPhone;
       });
+      _loadProfileData();
     }
   }
 
-  Future<void> _showChangePasswordDialog() async {
-    final oldPasswordCtrl = TextEditingController();
-    final newPasswordCtrl = TextEditingController();
-    final confirmPasswordCtrl = TextEditingController();
-    bool hideOld = true;
-    bool hideNew = true;
-    bool hideConfirm = true;
 
-    await showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          final dlgBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-          final dlgTxt = isDark ? Colors.white : const Color(0xFF0F172A);
-
-          return AlertDialog(
-            backgroundColor: dlgBg,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.lock_reset_rounded, color: Color(0xFF2563EB), size: 22),
-                ),
-                const SizedBox(width: 12),
-                Text('Ubah Kata Sandi', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: dlgTxt)),
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: oldPasswordCtrl,
-                    obscureText: hideOld,
-                    style: TextStyle(color: dlgTxt, fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText: 'Kata Sandi Saat Ini',
-                      labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20, color: Color(0xFF2563EB)),
-                      suffixIcon: IconButton(
-                        icon: Icon(hideOld ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
-                        onPressed: () => setDialogState(() => hideOld = !hideOld),
-                      ),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: newPasswordCtrl,
-                    obscureText: hideNew,
-                    style: TextStyle(color: dlgTxt, fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText: 'Kata Sandi Baru',
-                      labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                      prefixIcon: const Icon(Icons.key_rounded, size: 20, color: Color(0xFF2563EB)),
-                      suffixIcon: IconButton(
-                        icon: Icon(hideNew ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
-                        onPressed: () => setDialogState(() => hideNew = !hideNew),
-                      ),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: confirmPasswordCtrl,
-                    obscureText: hideConfirm,
-                    style: TextStyle(color: dlgTxt, fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText: 'Konfirmasi Sandi Baru',
-                      labelStyle: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                      prefixIcon: const Icon(Icons.check_circle_outline_rounded, size: 20, color: Color(0xFF2563EB)),
-                      suffixIcon: IconButton(
-                        icon: Icon(hideConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
-                        onPressed: () => setDialogState(() => hideConfirm = !hideConfirm),
-                      ),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: Text('Batal', style: TextStyle(color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B))),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2563EB),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                ),
-                onPressed: () async {
-                  final newPass = newPasswordCtrl.text;
-                  final confirmPass = confirmPasswordCtrl.text;
-
-                  if (newPass.isEmpty) {
-                    UiUtils.showToast(dialogContext, 'Kata sandi baru tidak boleh kosong', isError: true);
-                    return;
-                  }
-                  if (newPass.length < 6) {
-                    UiUtils.showToast(dialogContext, 'Kata sandi minimal 6 karakter', isError: true);
-                    return;
-                  }
-                  if (newPass != confirmPass) {
-                    UiUtils.showToast(dialogContext, 'Konfirmasi kata sandi baru tidak cocok', isError: true);
-                    return;
-                  }
-
-                  try {
-                    await Supabase.instance.client.auth.updateUser(
-                      UserAttributes(password: newPass),
-                    );
-                    if (dialogContext.mounted) Navigator.pop(dialogContext);
-                    if (context.mounted) UiUtils.showToast(context, 'Kata sandi berhasil diperbarui!');
-                  } catch (e) {
-                    if (dialogContext.mounted) {
-                      UiUtils.showToast(dialogContext, 'Gagal memperbarui kata sandi: $e', isError: true);
-                    }
-                  }
-                },
-                child: const Text('Simpan Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
 
   Future<void> _confirmLogout() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -363,33 +348,57 @@ class _ProfilPageState extends State<ProfilPage> {
                       children: [
                         Stack(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [Color(0xFF60A5FA), Color(0xFFA78BFA)],
+                            GestureDetector(
+                              onTap: _isUploadingAvatar ? null : _showAvatarOptions,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF60A5FA), Color(0xFFA78BFA)],
+                                  ),
                                 ),
-                              ),
-                              child: CircleAvatar(
-                                radius: 34,
-                                backgroundColor: const Color(0xFF1E293B),
-                                child: Text(
-                                  nameStr.isNotEmpty ? nameStr[0].toUpperCase() : 'U',
-                                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                                child: CircleAvatar(
+                                  radius: 34,
+                                  backgroundColor: const Color(0xFF1E293B),
+                                  backgroundImage: (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                                      ? NetworkImage(_avatarUrl!)
+                                      : null,
+                                  child: _isUploadingAvatar
+                                      ? const SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : (_avatarUrl == null || _avatarUrl!.isEmpty)
+                                          ? Text(
+                                              nameStr.isNotEmpty ? nameStr[0].toUpperCase() : 'U',
+                                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                                            )
+                                          : null,
                                 ),
                               ),
                             ),
                             Positioned(
-                              right: 2,
-                              bottom: 2,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF22C55E),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                              right: 0,
+                              bottom: 0,
+                              child: GestureDetector(
+                                onTap: _isUploadingAvatar ? null : _showAvatarOptions,
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2563EB),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt_rounded,
+                                    size: 13,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -453,15 +462,13 @@ class _ProfilPageState extends State<ProfilPage> {
                     const Divider(height: 1, color: Colors.white24),
                     const SizedBox(height: 14),
 
-                    // Quick Stats Chips inside Banner
+                    // Quick Stats Chips inside Banner (Real Supabase data)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildHeaderStatItem('Status Akun', 'Terverifikasi', Icons.check_circle_rounded),
+                        _buildHeaderStatItem('NIM / NIP', _currentIdNumber.isNotEmpty ? _currentIdNumber : '-', Icons.badge_rounded),
                         Container(width: 1, height: 28, color: Colors.white24),
-                        _buildHeaderStatItem('NIM / NIP', _currentIdNumber, Icons.badge_rounded),
-                        Container(width: 1, height: 28, color: Colors.white24),
-                        _buildHeaderStatItem('Presensi', '98% Aktif', Icons.insights_rounded),
+                        _buildHeaderStatItem('Program Studi', _currentDept.isNotEmpty ? _currentDept : '-', Icons.school_rounded),
                       ],
                     ),
                   ],
@@ -589,7 +596,9 @@ class _ProfilPageState extends State<ProfilPage> {
                       title: Text('Ubah Kata Sandi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
                       subtitle: Text('Perbarui keamanan kata sandi akun', style: TextStyle(fontSize: 11, color: subTextColor)),
                       trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
-                      onTap: _showChangePasswordDialog,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/change-password');
+                      },
                     ),
                     Divider(height: 1, color: dividerColor),
                     SwitchListTile(

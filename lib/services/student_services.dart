@@ -183,6 +183,27 @@ class StudentServices {
       throw Exception('Sesi akun siswa tidak valid. Silakan login kembali.');
     }
 
+    // Verify if assignment deadline has passed
+    try {
+      final tugasData = await _supabase
+          .from('tugas')
+          .select('deadline')
+          .eq('id', tugasId)
+          .maybeSingle();
+
+      if (tugasData != null && tugasData['deadline'] != null) {
+        final deadlineStr = tugasData['deadline'] as String;
+        if (deadlineStr.trim().isNotEmpty && deadlineStr != 'Tidak ada deadline') {
+          final dt = DateTime.tryParse(deadlineStr.trim());
+          if (dt != null && dt.isBefore(DateTime.now())) {
+            throw Exception('Tenggat waktu pengumpulan tugas ini telah berakhir. Jawaban tidak dapat dikirim.');
+          }
+        }
+      }
+    } catch (e) {
+      if (e.toString().contains('Tenggat waktu')) rethrow;
+    }
+
     final Map<String, dynamic> payload = {
       'tugas_id': tugasId,
       'student_id': validStudentId,

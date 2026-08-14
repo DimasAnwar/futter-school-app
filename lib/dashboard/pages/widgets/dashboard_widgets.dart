@@ -56,21 +56,32 @@ class WelcomeBanner extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    required this.icon,
+    this.icon,
   });
 
   final String title;
   final String subtitle;
-  final IconData icon;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: _primary,
-        borderRadius: BorderRadius.circular(18),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x332563EB),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -78,15 +89,26 @@ class WelcomeBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(subtitle, style: const TextStyle(color: Color(0xFFDCE8FF))),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Color(0xFFE2E8F0), fontSize: 13, height: 1.4),
+                ),
               ],
             ),
           ),
-          Icon(icon, color: Colors.white, size: 48),
+          if (icon != null) ...[
+            const SizedBox(width: 14),
+            Icon(icon, color: Colors.white, size: 40),
+          ],
         ],
       ),
     );

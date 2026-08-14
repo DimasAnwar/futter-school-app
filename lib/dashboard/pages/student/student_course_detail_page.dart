@@ -137,18 +137,41 @@ class _StudentCourseDetailPageState extends State<StudentCourseDetailPage>
 
             // Tab Navigation Header
             Container(
-              color: cardBg,
-              child: TabBar(
-                controller: _tabController,
-                indicatorColor: const Color(0xFF2563EB),
-                indicatorWeight: 3,
-                labelColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-                unselectedLabelColor: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                tabs: [
-                  Tab(text: 'Materi (${courseMateri.length})'),
-                  Tab(text: 'Tugas (${courseTugas.length})'),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0).withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorPadding: EdgeInsets.zero,
+                  labelPadding: EdgeInsets.zero,
+                  indicator: BoxDecoration(
+                    color: isDark ? const Color(0xFF2563EB) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  dividerColor: Colors.transparent,
+                  labelColor: isDark ? Colors.white : const Color(0xFF2563EB),
+                  unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  tabs: [
+                    Tab(text: 'Materi (${courseMateri.length})'),
+                    Tab(text: 'Tugas (${courseTugas.length})'),
+                  ],
+                ),
               ),
             ),
 

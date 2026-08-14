@@ -52,14 +52,24 @@ class StudentHomeView extends StatelessWidget {
   String _getTimeBasedGreeting() {
     final hour = DateTime.now().hour;
     if (hour >= 3 && hour < 11) {
-      return 'Selamat Pagi 🌅';
+      return 'Selamat Pagi';
     } else if (hour >= 11 && hour < 15) {
-      return 'Selamat Siang ☀️';
+      return 'Selamat Siang';
     } else if (hour >= 15 && hour < 18) {
-      return 'Selamat Sore 🌇';
+      return 'Selamat Sore';
     } else {
-      return 'Selamat Malam 🌙';
+      return 'Selamat Malam';
     }
+  }
+
+  bool _isTaskActive(Map<String, dynamic> tugas) {
+    final deadlineStr = tugas['deadline'] as String?;
+    if (deadlineStr == null || deadlineStr.trim().isEmpty || deadlineStr == 'Tidak ada deadline') {
+      return true;
+    }
+    final dt = DateTime.tryParse(deadlineStr.trim());
+    if (dt == null) return true;
+    return !dt.isBefore(DateTime.now());
   }
 
   @override
@@ -69,6 +79,8 @@ class StudentHomeView extends StatelessWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
+    final activeTugasList = tugasList.where(_isTaskActive).take(5).toList();
 
     return RefreshIndicator(
       onRefresh: onRefresh,
@@ -83,26 +95,35 @@ class StudentHomeView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _getTimeBasedGreeting(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF94A3B8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _getTimeBasedGreeting(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+                          letterSpacing: 0.3,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 6),
                     Text(
                       formattedName,
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: textColor,
+                        height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
@@ -110,12 +131,12 @@ class StudentHomeView extends StatelessWidget {
                         if (nim.isNotEmpty && nim != '-')
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
+                              horizontal: 10,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'NIM: $nim',
@@ -128,12 +149,12 @@ class StudentHomeView extends StatelessWidget {
                           ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
+                            horizontal: 10,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF3E8FF),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             formattedJurusan,
@@ -262,7 +283,7 @@ class StudentHomeView extends StatelessWidget {
                     Container(width: 1, height: 28, color: Colors.white24),
                     StatSubItem(
                       label: 'Tugas Aktif',
-                      value: '$tugasCount Tugas',
+                      value: '${activeTugasList.length} Tugas',
                       icon: Icons.assignment_rounded,
                     ),
                   ],
@@ -274,19 +295,13 @@ class StudentHomeView extends StatelessWidget {
           const SizedBox(height: 24),
 
           // --- 1. PENGUMUMAN CAROUSEL SLIDER (PALING ATAS) ---
-          Row(
-            children: const [
-              Icon(Icons.campaign_rounded, color: Color(0xFFF59E0B), size: 22),
-              SizedBox(width: 8),
-              Text(
-                'Pengumuman Kampus',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-            ],
+          Text(
+            'Pengumuman Kampus',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -299,48 +314,32 @@ class StudentHomeView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.assignment_rounded,
-                    color: Color(0xFF2563EB),
-                    size: 22,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Tugas Kuliah Aktif',
+              Text(
+                'Tugas Kuliah Aktif',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+              if (tugasList.length > activeTugasList.length || activeTugasList.isNotEmpty)
+                TextButton(
+                  onPressed: onOpenAcademicsTab,
+                  child: const Text(
+                    'Lihat Semua',
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: textColor,
+                      color: Color(0xFF2563EB),
                     ),
                   ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$tugasCount Tugas',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2563EB),
-                  ),
-                ),
-              ),
             ],
           ),
 
           const SizedBox(height: 14),
 
-          if (tugasList.isEmpty)
+          if (activeTugasList.isEmpty)
             CardContainer(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -361,7 +360,7 @@ class StudentHomeView extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Semua tugas telah diselesaikan atau belum ada tugas baru dari dosen.',
+                    'Semua tugas telah diselesaikan atau tenggat waktu telah berakhir.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                   ),
@@ -369,7 +368,7 @@ class StudentHomeView extends StatelessWidget {
               ),
             )
           else
-            ...tugasList.map((tugas) {
+            ...activeTugasList.map((tugas) {
               final tugasId = tugas['id'] as String;
               final existingSub = submissions
                   .cast<Map<String, dynamic>?>()
